@@ -1,0 +1,346 @@
+<?php
+include "config.php";
+include "header.php";
+
+$festival_id = $_GET['festival_id'] ?? null;
+$name = $_GET['name'] ?? null;
+$contactNumber = $_GET['contactNumber'] ?? null;
+$id = $_GET['id'] ?? null;
+
+$_SESSION['is_admin'] = ($user_role == 'admin');
+
+// Base query for selecting records
+$query = "SELECT * FROM mrg WHERE festival_id = $festival_id";
+
+// Adding search filters to the query
+if ($id) {
+    $query .= " AND id LIKE '%$id%'";
+}
+if ($name) {
+    $query .= " AND name LIKE '%$name%'";
+}
+if ($contactNumber) {
+    $query .= " AND contactNumber LIKE '%$contactNumber%'";
+}
+
+$query .= " ORDER BY id DESC;";
+$res = mysqli_query($conn, $query);
+
+// Fetch admin details
+$admin_res = mysqli_query($conn, "SELECT * FROM company_details");
+$admin = mysqli_fetch_assoc($admin_res);
+
+$sql = "SELECT 
+    (SUM(fivehundred) * 500) + 
+    (SUM(twohundred) * 200) + 
+    (SUM(hundred) * 100) + 
+    (SUM(fiftyrupees) * 50) + 
+    (SUM(twentyrupees) * 20) + 
+    (SUM(tenrupee) * 10) + 
+    (SUM(onerupee) * 1) AS total_amount,
+    SUM(fivehundred) AS total_fivehundred, 
+    SUM(twohundred) AS total_twohundred, 
+    SUM(hundred) AS total_hundred, 
+    SUM(fiftyrupees) AS total_fiftyrupees, 
+    SUM(twentyrupees) AS total_twentyrupees, 
+    SUM(tenrupee) AS total_tenrupee, 
+    SUM(onerupee) AS total_onerupee 
+FROM mrg 
+WHERE festival_id = ?";
+
+// Prepare and execute the query
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $festival_id);
+$stmt->execute();
+$stmt->bind_result($total_amount, $total_fivehundred, $total_twohundred, $total_hundred, $total_fiftyrupees, $total_twentyrupees, $total_tenrupee, $total_onerupee);
+$stmt->fetch();
+$stmt->close();
+
+// If no records are found, default values should be set to 0
+if ($total_amount === null) {
+    $total_amount = 0;
+    $total_fivehundred = 0;
+    $total_twohundred = 0;
+    $total_hundred = 0;
+    $total_fiftyrupees = 0;
+    $total_twentyrupees = 0;
+    $total_tenrupee = 0;
+    $total_onerupee = 0;
+}
+
+?>
+<style>
+    .form-group label {
+            font-weight: bold;
+        }
+
+        .form-group input[type="number"] {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+        }
+
+        .divider {
+            margin: 20px 0;
+            border-top: 2px solid #007bff;
+        }
+
+        .result {
+            font-size: 18px;
+            color: #007bff;
+            font-weight: bold;
+            text-align: right;
+        }
+</style>
+
+<div class="container mt-3">    
+    <br />
+    <button class="btn btn-primary" onclick="window.location.href='generate_pdf.php?festival_id=<?php echo $festival_id; ?>'">
+        Generate and Download PDF
+    </button>
+
+    <button class="btn btn-success" onclick="window.location.href='generate_csv.php?festival_id=<?php echo $festival_id; ?>'">
+        Generate and Download CSV
+    </button>
+    
+    <br />
+    <h3 class="text-center mb-3">DETAILS</h3>
+    <br />
+    <form method="GET">
+        <input type="hidden" name="festival_id" value="<?php echo $festival_id; ?>">
+        <div class="row mb-3">
+            <div class="col">
+                <input type="text" name="id" class="form-control" placeholder="Search by ID" value="<?php echo $id; ?>">
+            </div>
+            <div class="col">
+                <input type="text" name="name" class="form-control" placeholder="Search by Name" value="<?php echo $name; ?>">
+            </div>
+            <div class="col">
+                <input type="text" name="contactNumber" class="form-control" placeholder="Search by Mobile Number" value="<?php echo $contactNumber; ?>">
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </div>
+    </form>
+    <br />
+    <table class="table table-striped table-bordered text-center">
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">NAME</th>
+                <th scope="col">SPOUSE_NAME</th>
+                <th scope="col">Relationship</th>
+                <th scope="col">contactNumber</th>
+                <th scope="col">PLACE</th>
+                <th scope="col">amount</th>
+                <th scope="col">ACTION</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            $counter = 1;
+            if (mysqli_num_rows($res) > 0) {
+                while ($row = mysqli_fetch_assoc($res)) {
+                    ?>
+                    <tr>
+                        <td><?php echo $counter++; ?></td>
+                        <td><?php echo $row['name']; ?></td>
+                        <td><?php echo $row['spouse_name']; ?></td>
+                        <td><?php echo $row['relative_name']; ?></td>
+                        <td><?php echo $row['contactNumber']; ?></td>
+                        <td><?php echo $row['place']; ?></td>
+                        <td><?php echo $row['amount']; ?></td>
+                        <td>
+                            <button onclick='openEditUserModal("<?php echo $row['id']; ?>")' class='btn btn-warning btn-sm'>Edit</button>
+                            <?php if ($role === 'admin') { ?>
+                                <a href="delete_moi.php?festival_id=<?php echo $festival_id; ?>&id=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
+                            <?php } ?>
+                        </td>
+                    </tr>
+                    <?php
+                }
+            } else {
+                ?>
+                <tr>
+                    <td colspan="8">No data available</td>
+                </tr>
+                <?php
+            }
+            ?>
+        </tbody>
+    </table>
+    <div class="form-group result text-right mt-3">
+                    <!-- Table for Denominations Count -->
+                    <!-- <strong>Denominations Count for Festival ID <?php //echo $festival_id; ?>:</strong><br><br> -->
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Denomination</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>500 ரூபாய்</td>
+                                <td><?php echo $total_fivehundred; ?></td>
+                            </tr>
+                            <tr>
+                                <td>200 ரூபாய்</td>
+                                <td><?php echo $total_twohundred; ?></td>
+                            </tr>
+                            <tr>
+                                <td>100 ரூபாய்</td>
+                                <td><?php echo $total_hundred; ?></td>
+                            </tr>
+                            <tr>
+                                <td>50 ரூபாய்</td>
+                                <td><?php echo $total_fiftyrupees; ?></td>
+                            </tr>
+                            <tr>
+                                <td>20 ரூபாய்</td>
+                                <td><?php echo $total_twentyrupees; ?></td>
+                            </tr>
+                            <tr>
+                                <td>10 ரூபாய்</td>
+                                <td><?php echo $total_tenrupee; ?></td>
+                            </tr>
+                            <tr>
+                                <td>1 ரூபாய்</td>
+                                <td><?php echo $total_onerupee; ?></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Total amount for the same festival_id -->
+                    <br>
+                    <strong>நிகழ்வின் மொத்த தொகை:</strong> <span id="festival_total"><?php echo $total_amount; ?></span>
+                    ரூபாய்
+                </div>
+</div>
+</body>
+</html>
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm" action="edit_moi.php" method="POST">
+                    <input type="hidden" name="id" id="edit-id">
+                    <input type="hidden" name="user_id" id="edit-uid">
+                    <input type="hidden" name="festival_id" id="edit-festival-id" value="<?php echo $festival_id; ?>">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label for="edit-name" class="form-label">பெயர்</label>
+                                    <input type="text" class="form-control" id="edit-name" name="name">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-profession" class="form-label">தொழில்</label>
+                                    <input type="text" class="form-control" id="edit-profession" name="profession" >
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-spouse-name" class="form-label">துணைவி பெயர்</label>
+                                    <input type="text" class="form-control" id="edit-spouse-name" name="spouse_name" >
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-profession1" class="form-label">தொழில்</label>
+                                    <input type="text" class="form-control" id="edit-profession1" name="profession1" >
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="mb-3">
+                                    <label for="edit-relative-name" class="form-label">உறவுமுறை பெயர்</label>
+                                    <input type="text" class="form-control" id="edit-relative-name" name="relative_name" >
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-place" class="form-label">ஊர்</label>
+                                    <input type="text" class="form-control" id="edit-place" name="place" >
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-contactnumber" class="form-label">தொடர்புஎண்</label>
+                                    <input type="text" class="form-control" id="edit-contactnumber" name="contactNumber" >
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-amount" class="form-label">மொத்தம்: ரூபாய்</label>
+                                    <input type="text" class="form-control" id="edit-amount" name="amount" >
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update</button> &emsp;&emsp;
+                        
+                        <button type="button" class="btn btn-secondary print-button" onclick="printReceipt()">
+                            Print
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="assets/js/bootstrap.bundle.min.js"></script>
+<script>
+    var adminContactNumber = '<?php echo $admin['contact_number']; ?>';
+    var adminCompanyName = '<?php echo $admin['company_name']; ?>';
+    // var isAdmin = <?php //echo json_encode($_SESSION['is_admin']); ?>;
+    function openEditUserModal(id) {
+        fetch('get_moi.php?id=' + id)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('edit-id').value = data.id;
+                document.getElementById('edit-uid').value = data.id;
+                document.getElementById('edit-name').value = data.name;
+                document.getElementById('edit-spouse-name').value = data.spouse_name;
+                document.getElementById('edit-profession').value = data.profession;
+                document.getElementById('edit-profession1').value = data.profession1;
+                document.getElementById('edit-relative-name').value = data.relative_name;
+                document.getElementById('edit-contactnumber').value = data.contactNumber;
+                document.getElementById('edit-place').value = data.place;
+                document.getElementById('edit-amount').value = data.amount;
+
+                var editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+                editUserModal.show();
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function printReceipt() {
+        var id = document.getElementById('edit-id').value;
+        var name = document.getElementById('edit-name').value;
+        var profession = document.getElementById('edit-profession').value;
+        var spouseName = document.getElementById('edit-spouse-name').value;
+        var profession1 = document.getElementById('edit-profession1').value;
+        var relativeName = document.getElementById('edit-relative-name').value;
+        var place = document.getElementById('edit-place').value;
+        var contactNumber = document.getElementById('edit-contactnumber').value;
+        var amount = document.getElementById('edit-amount').value;
+        var festivalId = '<?php echo $festival_id; ?>';
+
+        // Construct the URL for print_receipt.php
+        var url = 'edit_print_receipt.php?id=' + encodeURIComponent(id) +
+                '&name=' + encodeURIComponent(name) +
+                '&profession=' + encodeURIComponent(profession) +
+                '&spouse_name=' + encodeURIComponent(spouseName) +
+                '&profession1=' + encodeURIComponent(profession1) +
+                '&relative_name=' + encodeURIComponent(relativeName) +
+                '&place=' + encodeURIComponent(place) +
+                '&contactNumber=' + encodeURIComponent(contactNumber) +
+                '&amount=' + encodeURIComponent(amount) +
+                '&festival_id=' + encodeURIComponent(festivalId);
+
+        // Redirect to the constructed URL
+        window.location.href = url;
+    }
+
+
+</script>
+
+
+<?php include('footer.php'); ?>

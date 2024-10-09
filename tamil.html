@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thermal Printer Receipt</title>
+    <style>
+        /* Style the receipt container to match the thermal paper size */
+        #receiptContent {
+            width: 80mm; /* For 80mm wide thermal paper */
+            margin: 0 auto;
+            padding: 10mm;
+            font-family: 'Courier New', Courier, monospace; /* Use a monospaced font for a receipt-like appearance */
+            font-size: 12px;
+            line-height: 1.5;
+            border: 1px solid #ddd; /* Optional: Border to visualize the receipt area on screen */
+        }
+
+        /* Apply the same styles for the print preview */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #receiptContent, #receiptContent * {
+                visibility: visible;
+            }
+            #receiptContent {
+                position: absolute;
+                left: 0;
+                top: 0;
+                margin: 0;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Content to Print -->
+    <div id="receiptContent">
+        <h2 style="text-align: center; margin: 0;">Store Name</h2>
+        <p style="text-align: center; margin: 0;">123 Main Street</p>
+        <p style="text-align: center; margin: 0;">City, State ZIP</p>
+        <p style="text-align: center; margin: 0;">Phone: (123) 456-7890</p>
+        <hr>
+        <p>Date: 2024-08-31</p>
+        <p>Item 1: $10.00</p>
+        <p>Item 2: $15.00</p>
+        <p><strong>Total: $25.00</strong></p>
+        <hr>
+        <p style="text-align: center;">Thank you for your purchase!</p>
+    </div>
+
+    <!-- Print Button -->
+    <button id="printButton">Print Receipt</button>
+
+    <!-- JavaScript -->
+    <script>
+        document.getElementById("printButton").addEventListener("click", function() {
+            window.print();
+        });
+    </script>
+</body>
+</html>
