@@ -172,15 +172,15 @@ if ($total_amount === null) {
     </div>
     <div class="form-group">
         <label for="profession">தொழில்</label>
-        <input type="text" class="form-control" id="profession" name="profession">
+        <input type="text" class="form-control" id="profession" name="profession" required>
     </div>
     <div class="form-group">
         <label for="spouse_name">துணைவி பெயர்</label>
-        <input type="text" class="form-control" id="spouse_name" name="spouse_name">
+        <input type="text" class="form-control" id="spouse_name" name="spouse_name"required>
     </div>
     <div class="form-group">
         <label for="profession1">தொழில்</label>
-        <input type="text" class="form-control" id="profession1" name="profession1">
+        <input type="text" class="form-control" id="profession1" name="profession1" required>
     </div>
     <div class="form-group">
     <div class="form-group">
@@ -222,8 +222,8 @@ if ($total_amount === null) {
         <input type="text" class="form-control" id="place" name="place" required>
     </div>
     <div class="form-group">
-        <label for="moi_amount">செய்த மொய்</label>
-        <input type="text" class="form-control" id="moi_amount" name="moi_amount" required>
+        <label for="moi_amount"> மொய்</label>
+        <input type="number" class="form-control" id="moi_amount" name="moi_amount" required>
     </div>
 </div>
 
