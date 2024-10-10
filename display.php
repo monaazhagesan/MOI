@@ -14,10 +14,12 @@ $uid = $_SESSION['id'];
 $role = $_SESSION['role']; // Assuming role is stored in the session
 
 // Fetch festivals based on user role (admin vs user)
-if ($role === "admin") {
-    // Admin: Retrieve all festivals
+// Fetch festivals based on user role (admin vs user)
+if ($role === "admin" || $role === "user") {
+    // Retrieve all festivals for both admin and user
     $res = mysqli_query($conn, "SELECT * FROM festival WHERE status = 0;");
-} else {
+}
+ else {
     // Non-admin: Retrieve only the festivals assigned to the user
     $res = mysqli_query($conn, "SELECT ufa.festival_id as id, f.name, f.spouse_name, f.occupation, f.festival_name, f.date, f.place 
                                 FROM festival f 
@@ -166,15 +168,24 @@ if (isset($_POST['assign_festival'])) {
                             <td><?php echo $row['date']; ?></td>
                             <td><?php echo $row['place']; ?></td>
                             <td>
-                                <a href="moi.php?moi_id=<?php echo $row['id']; ?>" class="btn btn-primary">Form</a>
-                                <?php if ($role === "admin") { ?>
-                                    <a href="edit.php?edit_id=<?php echo $row['id']; ?>" class="btn btn-info">Edit</a>
-                                    <a href="display.php?delete_id=<?php echo $row['id']; ?>" class="btn btn-danger">Delete</a>
-                                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#assignModal" onclick="assignUser(<?php echo $row['id']; ?>)">Assign</button>
-                                    <a href="display.php?close_id=<?php echo $row['id']; ?>" class="btn btn-secondary">Close</a>
-                                <?php } ?>
-                                <a href="moidisplay.php?festival_id=<?php echo $row['id']; ?>" class="btn btn-warning">List</a>
-                            </td>
+    <a href="moi.php?moi_id=<?php echo $row['id']; ?>" class="btn btn-primary">Form</a>
+    <?php if ($role === "admin" || $role === "user") { // Allow delete for both admin and user ?>
+        <a href="edit.php?edit_id=<?php echo $row['id']; ?>" class="btn btn-info">Edit</a>
+        
+        <!-- Delete Button with Confirmation -->
+        <a href="display.php?delete_id=<?php echo $row['id']; ?>" 
+           class="btn btn-danger" 
+           onclick="return confirm('Are you sure you want to delete this record?');">Delete</a>
+        
+        <?php if ($role === "admin") { ?>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" 
+                    data-bs-target="#assignModal" onclick="assignUser(<?php echo $row['id']; ?>)">Assign</button>
+            <a href="display.php?close_id=<?php echo $row['id']; ?>" class="btn btn-secondary">Close</a>
+        <?php } ?>
+        <a href="moidisplay.php?festival_id=<?php echo $row['id']; ?>" class="btn btn-warning">List</a>
+    <?php } ?>
+</td>
+
                         </tr>
                     <?php
                     }
