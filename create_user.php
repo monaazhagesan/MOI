@@ -37,3 +37,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 $conn->close();
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Collection Report</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h2 class="text-center">My Collection Report</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>  User Id </th>
+                    <th> Name</th>
+                    <th>Mobile number</th>
+                </tr>
+            </thead>
+            <tbody>
+                    <tr>
+                        <td><?php echo $row['id']; ?></td>
+                        <td><?php echo $row['username']; ?></td>
+                        <td><?php echo $row['mobile_number']; ?></td>
+                    </tr>
+            </tbody>
+        </table>
+        <a href="generate_pdf.php" class="btn btn-primary">Download PDF</a>
+    </div>
+</body>
+</html>

@@ -203,10 +203,10 @@ $currentDateTime = date("Y-m-d h:i A");
 
     <?php if (!empty($receiptData)): ?>
         <div class="festival-details">
-            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['fname']); ?> <?php echo htmlspecialchars($receiptData['fspouse_name']); ?></strong></p>
-            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['ffestival_name']); ?></strong></p>
-            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['fplace']); ?></strong></p>
-            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['fdate']); ?></strong></p>
+            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['fname']); ?> <?php echo htmlspecialchars($receiptData['fspouse_name']); ?></strong></p><br>
+            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['ffestival_name']); ?></strong></p><br>
+            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['fplace']); ?></strong></p><br>
+            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['fdate']); ?></strong></p><br>
         </div>
 
         <hr />
@@ -216,15 +216,15 @@ $currentDateTime = date("Y-m-d h:i A");
                 <strong>
                     <span><?php echo $currentDateTime; ?></span>&emsp;&emsp;&emsp;<span><?php echo '#'.$id; ?></span>
                 </strong>
-            </p>
-            <p style="line-height: 0.9;"><?php echo htmlspecialchars($receiptData['place']); ?></p>
-            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['name']); ?></strong> (<?php echo htmlspecialchars($receiptData['profession']); ?>)</p>
+            </p><br>
+            <p style="line-height: 0.9;"><?php echo htmlspecialchars($receiptData['place']); ?></p><br>
+            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['name']); ?></strong> (<?php echo htmlspecialchars($receiptData['profession']); ?>)</p><br>
 
             <?php if ($receiptData['spouse_name'] != ''): ?>
-                <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['spouse_name']); ?></strong> (<?php echo htmlspecialchars($receiptData['profession1']); ?>)</p>
+                <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['spouse_name']); ?></strong> (<?php echo htmlspecialchars($receiptData['profession1']); ?>)</p><br>
             <?php endif; ?>
 
-            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['contactNumber']); ?></strong></p>
+            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['contactNumber']); ?></strong></p><br>
             <!-- <p style="line-height: 0.9;"><?php echo htmlspecialchars($receiptData['relative_name']); ?></p> -->
         </div>
 
@@ -271,15 +271,15 @@ $currentDateTime = date("Y-m-d h:i A");
 
         <div class="total">
             <p><strong>ரூ. <?php echo number_format($totalAmount, 0); ?></strong></p>
-        </div>
+        </div><br>
 
         <div>
             <p style="line-height: 0.5;">&emsp;<strong>எழுத்தர்:</strong> <?php echo $userName; ?></p>
-        </div>
+        </div><br>
 
         <div>
-            <p style="line-height: 0.5;">&emsp;தங்கள் நல்வரவுக்கு நன்றி</p>
-        </div>
+            <p style="line-height: 0.5;">&emsp;தங்கள் நல்வரவுக்கு <br><br><br>&nbsp;&nbsp;&nbsp;&nbsp;நன்றி</p>
+        </div><br>
 
         <div class="print-button">
             <button type="button"class="btn btn-primary" onclick="printAndRedirect()">Print Receipt</button>

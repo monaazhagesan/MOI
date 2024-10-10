@@ -1,6 +1,6 @@
 <?php
 $page_title = "User List";
-include('header.php');
+include('user_index.php');
 
 $servername = "localhost";
 $username = "root";
@@ -16,26 +16,22 @@ if ($conn->connect_error) {
 
 $sql = "SELECT id, username, mobile_number, status FROM users ORDER BY created_at DESC";
 $result = $conn->query($sql);
-
-
 ?>
 
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>User List</h2>
-        <!-- Button trigger modal -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
-            Add User
-        </button>
+        <!-- Button to download user list as PDF -->
+        <a href="download_user_pdf.php" class="btn btn-success">Download PDF</a>
     </div>
     <table class="table table-striped">
         <thead>
             <tr>
+                <th>ID</th>
                 <th>Username</th>
                 <th>Mobile Number</th>
                 <th>Status</th>
                 <th>Actions</th>
-                
             </tr>
         </thead>
         <tbody>
@@ -43,6 +39,7 @@ $result = $conn->query($sql);
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     echo "<tr>";
+                    echo "<td>" . htmlspecialchars($row['id']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['username']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['mobile_number']) . "</td>";
                     echo "<td>" . ($row['status'] == 1 ? 'Active' : 'Inactive') . "</td>";
@@ -54,42 +51,12 @@ $result = $conn->query($sql);
                     echo "</tr>";
                 }
             } else {
-                echo "<tr><td colspan='4'>No users found.</td></tr>";
+                echo "<tr><td colspan='5'>No users found.</td></tr>";
             }
             ?>
         </tbody>
     </table>
 </div>
-
-<!-- Add User Modal Start-->
-<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addUserModalLabel">Create New User</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form action="create_user.php" method="post">
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username:</label>
-                        <input type="text" id="username" name="username" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password:</label>
-                        <input type="password" id="password" name="password" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="mobile_number" class="form-label">Mobile Number:</label>
-                        <input type="text" id="mobile_number" name="mobile_number" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Create User</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Add User Modal End-->
 
 <!-- Edit User Modal -->
 <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
@@ -143,9 +110,3 @@ $result = $conn->query($sql);
 <?php
 $conn->close();
 ?>
-
-<!-- Username	Mobile Number	Status	Actions
-Anand	8072532422	Active	  
-Anumanthan	6382916482	Active	  
-B. பவித்ரா	9361578348	Inactive	  
-ilamathi	9361578348	Active -->

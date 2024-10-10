@@ -30,12 +30,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['username'] = $username;
         $_SESSION['id'] = $id;
         $_SESSION['role'] = 'admin';
-        header("Location: index.php");
+        header("Location: index.php"); 
         exit;
     } else {
         // Check if the user is a regular user
         $stmt->close();
-        $sql = "SELECT id, username, password FROM users WHERE username = ? and status=1";
+        $sql = "SELECT id, username, password FROM users WHERE username = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $inputUsername);
         $stmt->execute();
@@ -48,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['username'] = $username;
             $_SESSION['id'] = $id;
             $_SESSION['role'] = 'user';
-            header("Location: index.php");
+            header("Location: index.php"); 
             exit;
         } else {
             echo "Invalid username or password.";
@@ -57,10 +57,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $stmt->close();
 }
-
 $conn->close();
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
