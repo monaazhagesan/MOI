@@ -215,7 +215,7 @@ foreach ($res_others as $row) {
 
         $html .= '<tr>
         <td colspan="2" style="text-align:right;padding: 10px;font-family: latha;font-size:16px;"><strong>பக்கத்தின் மொத்தம்</strong></td>
-        <td style="text-align:right;padding: 10px;"><strong>' . number_format($pageTotal, 0) . '</strong></td>
+        <td style="text-align:right;padding: 10px; font-size:30px;"><strong>' . number_format($pageTotal, 0) . '</strong></td>
         <td colspan="2"></td>
     </tr></tbody></table>';
 
