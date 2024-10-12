@@ -61,7 +61,7 @@ if ($count <= 1) {
     $startPage = 2;
 }
 if ($count > 1) {
-    $startPage = floor($count);
+    $startPage = ceil($count);
 }
 
 // $startPage = count(array_keys($groupedData)) / 10 ; // Start from page 2 as index is on page 1
