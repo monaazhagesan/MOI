@@ -11,16 +11,12 @@ if (isset($_SESSION['message'])) {
 
 // Get the user ID from session
 $uid = $_SESSION['id'];
-$role = $_SESSION['role']; // Assuming role is stored in the session
+$role = $_SESSION['role']; 
 
-// Fetch festivals based on user role (admin vs user)
-// Fetch festivals based on user role (admin vs user)
 if ($role === "admin" || $role === "user") {
-    // Retrieve all festivals for both admin and user
     $res = mysqli_query($conn, "SELECT * FROM festival WHERE status = 0;");
 }
  else {
-    // Non-admin: Retrieve only the festivals assigned to the user
     $res = mysqli_query($conn, "SELECT ufa.festival_id as id, f.name, f.spouse_name, f.occupation, f.festival_name, f.date, f.place 
                                 FROM festival f 
                                 JOIN user_festival_assignment ufa ON ufa.festival_id = f.id 
