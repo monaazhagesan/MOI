@@ -15,7 +15,7 @@ $role = $_SESSION['role']; // Assuming role is stored in the session
 
 // Fetch festivals based on user role (admin vs user)
 // Fetch festivals based on user role (admin vs user)
-if ($role === "admin" || $role === "user") {
+if ($role === "admin") {
     // Retrieve all festivals for both admin and user
     $res = mysqli_query($conn, "SELECT * FROM festival WHERE status = 0;");
 }
@@ -27,6 +27,7 @@ if ($role === "admin" || $role === "user") {
                                 JOIN users u ON u.id = ufa.user_id 
                                 WHERE u.id='$uid' AND f.status = 0");
 }
+
 
 // Handle new festival registration
 if (isset($_POST["submit"])) {
