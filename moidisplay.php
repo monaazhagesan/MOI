@@ -71,30 +71,30 @@ if ($total_amount === null) {
 ?>
 <style>
     .form-group label {
-            font-weight: bold;
-        }
+        font-weight: bold;
+    }
 
-        .form-group input[type="number"] {
-            width: 100%;
-            padding: 5px;
-            border: 1px solid #ced4da;
-            border-radius: 5px;
-        }
+    .form-group input[type="number"] {
+        width: 100%;
+        padding: 5px;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+    }
 
-        .divider {
-            margin: 20px 0;
-            border-top: 2px solid #007bff;
-        }
+    .divider {
+        margin: 20px 0;
+        border-top: 2px solid #007bff;
+    }
 
-        .result {
-            font-size: 18px;
-            color: #007bff;
-            font-weight: bold;
-            text-align: right;
-        }
+    .result {
+        font-size: 18px;
+        color: #007bff;
+        font-weight: bold;
+        text-align: right;
+    }
 </style>
 
-<div class="container mt-3">    
+<div class="container mt-3">
     <br />
     <button class="btn btn-primary" onclick="window.location.href='generate_pdf.php?festival_id=<?php echo $festival_id; ?>'">
         Generate and Download PDF
@@ -103,7 +103,7 @@ if ($total_amount === null) {
     <button class="btn btn-success" onclick="window.location.href='generate_csv.php?festival_id=<?php echo $festival_id; ?>'">
         Generate and Download CSV
     </button>
-    
+
     <br />
     <h3 class="text-center mb-3">DETAILS</h3>
     <br />
@@ -143,7 +143,7 @@ if ($total_amount === null) {
             $counter = 1;
             if (mysqli_num_rows($res) > 0) {
                 while ($row = mysqli_fetch_assoc($res)) {
-                    ?>
+            ?>
                     <tr>
                         <td><?php echo $counter++; ?></td>
                         <td><?php echo $row['name']; ?></td>
@@ -153,73 +153,75 @@ if ($total_amount === null) {
                         <td><?php echo $row['place']; ?></td>
                         <td><?php echo $row['amount']; ?></td>
                         <td>
-                            <button onclick='openEditUserModal("<?php echo $row['id']; ?>")' class='btn btn-warning btn-sm'>Edit</button>
+                            <button onclick="openEditUserModal(<?php echo $row['id']; ?>)" class='btn btn-warning btn-sm'>Edit</button>
                             <?php if ($role === 'admin') { ?>
                                 <a href="delete_moi.php?festival_id=<?php echo $festival_id; ?>&id=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
                             <?php } ?>
                         </td>
                     </tr>
-                    <?php
+                <?php
                 }
             } else {
                 ?>
                 <tr>
                     <td colspan="8">No data available</td>
                 </tr>
-                <?php
+            <?php
             }
             ?>
         </tbody>
     </table>
     <div class="form-group result text-right mt-3">
-                    <!-- Table for Denominations Count -->
-                    <!-- <strong>Denominations Count for Festival ID <?php //echo $festival_id; ?>:</strong><br><br> -->
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Denomination</th>
-                                <th>Count</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>500 ரூபாய்</td>
-                                <td><?php echo $total_fivehundred; ?></td>
-                            </tr>
-                            <tr>
-                                <td>200 ரூபாய்</td>
-                                <td><?php echo $total_twohundred; ?></td>
-                            </tr>
-                            <tr>
-                                <td>100 ரூபாய்</td>
-                                <td><?php echo $total_hundred; ?></td>
-                            </tr>
-                            <tr>
-                                <td>50 ரூபாய்</td>
-                                <td><?php echo $total_fiftyrupees; ?></td>
-                            </tr>
-                            <tr>
-                                <td>20 ரூபாய்</td>
-                                <td><?php echo $total_twentyrupees; ?></td>
-                            </tr>
-                            <tr>
-                                <td>10 ரூபாய்</td>
-                                <td><?php echo $total_tenrupee; ?></td>
-                            </tr>
-                            <tr>
-                                <td>1 ரூபாய்</td>
-                                <td><?php echo $total_onerupee; ?></td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <!-- Table for Denominations Count -->
+        <!-- <strong>Denominations Count for Festival ID <?php //echo $festival_id; 
+                                                            ?>:</strong><br><br> -->
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Denomination</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>500 ரூபாய்</td>
+                    <td><?php echo $total_fivehundred; ?></td>
+                </tr>
+                <tr>
+                    <td>200 ரூபாய்</td>
+                    <td><?php echo $total_twohundred; ?></td>
+                </tr>
+                <tr>
+                    <td>100 ரூபாய்</td>
+                    <td><?php echo $total_hundred; ?></td>
+                </tr>
+                <tr>
+                    <td>50 ரூபாய்</td>
+                    <td><?php echo $total_fiftyrupees; ?></td>
+                </tr>
+                <tr>
+                    <td>20 ரூபாய்</td>
+                    <td><?php echo $total_twentyrupees; ?></td>
+                </tr>
+                <tr>
+                    <td>10 ரூபாய்</td>
+                    <td><?php echo $total_tenrupee; ?></td>
+                </tr>
+                <tr>
+                    <td>1 ரூபாய்</td>
+                    <td><?php echo $total_onerupee; ?></td>
+                </tr>
+            </tbody>
+        </table>
 
-                    <!-- Total amount for the same festival_id -->
-                    <br>
-                    <strong>நிகழ்வின் மொத்த தொகை:</strong> <span id="festival_total"><?php echo $total_amount; ?></span>
-                    ரூபாய்
-                </div>
+        <!-- Total amount for the same festival_id -->
+        <br>
+        <strong>நிகழ்வின் மொத்த தொகை:</strong> <span id="festival_total"><?php echo $total_amount; ?></span>
+        ரூபாய்
+    </div>
 </div>
 </body>
+
 </html>
 <!-- Edit User Modal -->
 <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
@@ -243,38 +245,45 @@ if ($total_amount === null) {
                                 </div>
                                 <div class="mb-3">
                                     <label for="edit-profession" class="form-label">தொழில்</label>
-                                    <input type="text" class="form-control" id="edit-profession" name="profession" >
+                                    <input type="text" class="form-control" id="edit-profession" name="profession">
                                 </div>
                                 <div class="mb-3">
                                     <label for="edit-spouse-name" class="form-label">துணைவி பெயர்</label>
-                                    <input type="text" class="form-control" id="edit-spouse-name" name="spouse_name" >
+                                    <input type="text" class="form-control" id="edit-spouse-name" name="spouse_name">
                                 </div>
                                 <div class="mb-3">
                                     <label for="edit-profession1" class="form-label">தொழில்</label>
-                                    <input type="text" class="form-control" id="edit-profession1" name="profession1" >
+                                    <input type="text" class="form-control" id="edit-profession1" name="profession1">
                                 </div>
                             </div>
                             <div class="col-6">
+                               
                                 <div class="mb-3">
-                                    <label for="edit-relative-name" class="form-label">உறவுமுறை பெயர்</label>
-                                    <input type="text" class="form-control" id="edit-relative-name" name="relative_name" >
+                                <label for="edit-relative-name" class="form-label">உறவுமுறை பெயர்</label>
+                                <select class="form-select"  id="edit-relative-name" name="relative_name">
+                                        <option value="" disabled selected>உறவுமுறை தேர்வு செய்க</option> <!-- Placeholder option -->
+                                        <option value="உறவுமுறை">உறவுமுறை</option>
+                                        <option value="தாய்மாமன்">தாய்மாமன்</option>
+                                        <option value="other">மற்றவை</option>
+                                    </select>
                                 </div>
+
                                 <div class="mb-3">
                                     <label for="edit-place" class="form-label">ஊர்</label>
-                                    <input type="text" class="form-control" id="edit-place" name="place" >
+                                    <input type="text" class="form-control" id="edit-place" name="place">
                                 </div>
                                 <div class="mb-3">
                                     <label for="edit-contactnumber" class="form-label">தொடர்புஎண்</label>
-                                    <input type="text" class="form-control" id="edit-contactnumber" name="contactNumber" >
+                                    <input type="text" class="form-control" id="edit-contactnumber" name="contactNumber">
                                 </div>
                                 <div class="mb-3">
                                     <label for="edit-amount" class="form-label">மொத்தம்: ரூபாய்</label>
-                                    <input type="text" class="form-control" id="edit-amount" name="amount" >
+                                    <input type="text" class="form-control" id="edit-amount" name="amount">
                                 </div>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Update</button> &emsp;&emsp;
-                        
+
                         <button type="button" class="btn btn-secondary print-button" onclick="printReceipt()">
                             Print
                         </button>
@@ -289,7 +298,8 @@ if ($total_amount === null) {
 <script>
     var adminContactNumber = '<?php echo $admin['contact_number']; ?>';
     var adminCompanyName = '<?php echo $admin['company_name']; ?>';
-    // var isAdmin = <?php //echo json_encode($_SESSION['is_admin']); ?>;
+    // var isAdmin = <?php //echo json_encode($_SESSION['is_admin']); 
+                        ?>;
     function openEditUserModal(id) {
         fetch('get_moi.php?id=' + id)
             .then(response => response.json())
@@ -325,21 +335,19 @@ if ($total_amount === null) {
 
         // Construct the URL for print_receipt.php
         var url = 'edit_print_receipt.php?id=' + encodeURIComponent(id) +
-                '&name=' + encodeURIComponent(name) +
-                '&profession=' + encodeURIComponent(profession) +
-                '&spouse_name=' + encodeURIComponent(spouseName) +
-                '&profession1=' + encodeURIComponent(profession1) +
-                '&relative_name=' + encodeURIComponent(relativeName) +
-                '&place=' + encodeURIComponent(place) +
-                '&contactNumber=' + encodeURIComponent(contactNumber) +
-                '&amount=' + encodeURIComponent(amount) +
-                '&festival_id=' + encodeURIComponent(festivalId);
+            '&name=' + encodeURIComponent(name) +
+            '&profession=' + encodeURIComponent(profession) +
+            '&spouse_name=' + encodeURIComponent(spouseName) +
+            '&profession1=' + encodeURIComponent(profession1) +
+            '&relative_name=' + encodeURIComponent(relativeName) +
+            '&place=' + encodeURIComponent(place) +
+            '&contactNumber=' + encodeURIComponent(contactNumber) +
+            '&amount=' + encodeURIComponent(amount) +
+            '&festival_id=' + encodeURIComponent(festivalId);
 
         // Redirect to the constructed URL
         window.location.href = url;
     }
-
-
 </script>
 
 

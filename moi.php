@@ -107,7 +107,7 @@ if ($total_amount === null) {
         .container-moi {
             max-width: 800px;
             margin: auto;
-            padding: 20px;
+            padding: 10px;
             border: 2px solid #007bff;
             border-radius: 10px;
             background-color: #f8f9fa;
