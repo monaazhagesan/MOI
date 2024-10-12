@@ -72,7 +72,7 @@ $currentPage = $startPage;
 foreach ($groupedData as $place => $records) {
     $curentRecords += count($records);
     $count = $curentRecords / 10;
-    // $count = $count - ($currentPage - $startPage);
+     $count = $count - ($currentPage - $startPage);
     // var_dump($place);
     // var_dump($curentRecords);
     // var_dump($count);
