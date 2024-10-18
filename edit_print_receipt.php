@@ -310,7 +310,7 @@ $conn->close();
 
         <!-- Total amount -->
         <div class="total">
-            <p><strong>ரூ. <?php echo number_format($amount, 2); ?></strong></p>
+            <p><strong>ரூ. <?php echo number_format($amount, 0); ?></strong></p>
         </div>
 
         <div>

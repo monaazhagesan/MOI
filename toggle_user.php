@@ -1,11 +1,6 @@
 <?php
 include('header.php');
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "moi";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
+include "config.php";
 
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);

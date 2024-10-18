@@ -165,7 +165,7 @@ if (!empty($res_thaimaman)) {
         if ($recordCount == $recordsPerPage) {
             $html .= '<tr>
                         <td colspan="3" style="text-align:right;padding: 10px;font-family: latha;"><strong>Page Total</strong></td>
-                        <td style="text-align:right;padding: 10px;"><strong>' . number_format($pageTotal, 2) . '</strong></td>
+                        <td style="text-align:right;padding: 10px;"><strong>' . number_format($pageTotal, 0) . '</strong></td>
                         <td colspan="2"></td>
                       </tr></tbody></table>';
 
@@ -195,7 +195,7 @@ if (!empty($res_thaimaman)) {
             (!empty($row['profession1']) ? ' (' . htmlspecialchars($row['profession1'], ENT_QUOTES, 'UTF-8') . ')' : '') .
             ' - ' . htmlspecialchars($row['spouse_name'], ENT_QUOTES, 'UTF-8') . '
                     </td>
-                    <td style="text-align:right; padding: 10px;font-family: latha;font-size: 30px; font-weight: bold;">' . number_format($row['amount'], 2) . '</td>
+                    <td style="text-align:right; padding: 10px;font-family: latha;font-size: 30px; font-weight: bold;">' . number_format($row['amount'], 0) . '</td>
                     <td style="font-size:14px;padding: 10px;font-family: latha;"></td>
                     <td style="text-align:right; padding: 10px;font-family: latha;"></td>
                   </tr>';

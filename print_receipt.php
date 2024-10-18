@@ -260,7 +260,7 @@ $currentDateTime = date("Y-m-d h:i A");
                 <tr>
                     <td><?php echo $denomination; ?></td>
                     <td><?php echo $quantity; ?></td>
-                    <td><?php echo number_format($lineTotal, 2); ?></td>
+                    <td><?php echo number_format($lineTotal, 0); ?></td>
                 </tr>
                 <?php
                     }

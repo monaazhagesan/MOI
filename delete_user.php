@@ -1,12 +1,7 @@
 <?php
 session_start();
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "moi";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
+include "config.php";
 
 // Check connection
 if ($conn->connect_error) {
