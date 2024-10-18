@@ -13,7 +13,7 @@ if (isset($_SESSION['message'])) {
 $uid = $_SESSION['id'];
 $role = $_SESSION['role']; 
 
-if ($role === "admin" || $role === "user") {
+if ($role === "admin") {
     $res = mysqli_query($conn, "SELECT * FROM festival WHERE status = 0;");
 }
  else {
