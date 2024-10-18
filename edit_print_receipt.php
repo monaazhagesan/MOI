@@ -209,10 +209,10 @@ $conn->close();
         <?php if (!empty($festivalDetails)): ?>
             <div class="festival-details">
                 <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($festivalDetails['name']); ?>
-                        <?php echo htmlspecialchars($festivalDetails['spouse_name']); ?></strong></p>
-                <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($festivalDetails['festival_name']); ?></strong></p>
-                <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($festivalDetails['place']); ?></strong></p>
-                <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($festivalDetails['date']); ?></strong></p>
+                        <?php echo htmlspecialchars($festivalDetails['spouse_name']); ?></strong></p><br>
+                <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($festivalDetails['festival_name']); ?></strong></p><br>
+                <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($festivalDetails['place']); ?></strong></p><br>
+                <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($festivalDetails['date']); ?></strong></p><br>
             </div>
         <?php endif; ?>
 
@@ -220,16 +220,16 @@ $conn->close();
 
         <div class="details">
             <p style="line-height: 0.9;"><strong><?php echo $currentDateTime; ?></strong>&emsp;&emsp;&emsp;<strong>#<?php echo $id; ?></strong>
-            </p>
-            <p style="line-height: 0.9;"><?php echo htmlspecialchars($place); ?></p>
+            </p><br>
+            <p style="line-height: 0.9;"><?php echo htmlspecialchars($place); ?></p><br>
             <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($name); ?></strong>
-                (<?php echo htmlspecialchars($profession); ?>)</p>
+                (<?php echo htmlspecialchars($profession); ?>)</p><br>
             <?php if ($spouse_name != ''): ?>
                 <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($spouse_name); ?></strong>
-                    (<?php echo htmlspecialchars($profession1); ?>)</p>
+                    (<?php echo htmlspecialchars($profession1); ?>)</p><br>
             <?php endif; ?>
-            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($contactNumber); ?></strong></p>
-            <p style="line-height: 0.9;"><?php echo htmlspecialchars($relative_name); ?></p>
+            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($contactNumber); ?></strong></p><br>
+            <!-- <p style="line-height: 0.9;"><?php echo htmlspecialchars($relative_name); ?></p> -->
         </div>
 
         <hr>
@@ -317,11 +317,11 @@ $conn->close();
             <p style="line-height: 0.5;"><strong>எழுத்தர்:</strong> <?php echo $userName; ?></p>
         </div>
         <div>
-            <p style="line-height: 0.5;">தங்கள் நல்வரவுக்கு நன்றி</p>
+            <p style="line-height: 0.5;">தங்கள் நல்வரவுக்கு <br><br><br>நன்றி</p>
         </div>
 
         <div class="print-button">
-            <button type="button" onclick="printAndRedirect()">Print Receipt</button>
+            <button type="button" class="btn btn-primary" onclick="printAndRedirect()">Print Receipt</button>
         </div>
     </div>
 
@@ -348,7 +348,7 @@ $conn->close();
                     row.remove(); // Completely remove rows with quantity 0
                 } else {
                     const total = quantity * amount;
-                    totalCell.textContent = total.toFixed(2);
+                    totalCell.textContent = parseInt(total);
                     grandTotal += total;
                 }
             });
