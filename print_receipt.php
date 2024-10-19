@@ -5,7 +5,7 @@ include "header.php";
 date_default_timezone_set('Asia/Kolkata');
 // Start session to access session variables
 session_start();
-
+// error_reporting(E_ALL);
 
 // Assuming you store the logged-in user's ID in the session
 $currentUserId = isset($_SESSION['id']) ? intval($_SESSION['id']) : null;
@@ -66,19 +66,25 @@ if ($result->num_rows > 0) {
 }
 $query->close();
 
-$conn->close();
 
 $currentDateTime = date("Y-m-d h:i A");
+
+$query = $conn->prepare("SELECT COUNT(*) AS mrg_count FROM mrg WHERE festival_id = $festival_id LIMIT 1");
+$query->execute();
+$result = $query->get_result()->fetch_assoc();
+$no = $result['mrg_count'];
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Receipt</title>
     <style>
-    /* General styles */
-    .receipt {
+        /* General styles */
+        .receipt {
             max-width: 570px;
             margin: 0 auto;
             border: 2px solid #ddd;
@@ -95,7 +101,7 @@ $currentDateTime = date("Y-m-d h:i A");
             justify-content: space-between;
             padding-bottom: 10px;
             border-bottom: 2px solid #ddd;
-            margin-bottom: 10px;            
+            margin-bottom: 10px;
             line-height: 1.1;
             /* Reduced margin */
         }
@@ -179,138 +185,140 @@ $currentDateTime = date("Y-m-d h:i A");
                 display: none;
             }
         }
-</style>
+    </style>
 </head>
+
 <body>
-<div class="receipt">
-    <?php if (!empty($companyData)): ?>
-        <div class="company-details">
-            <div class="logo-section">
-                <img src="img/img.jpeg" alt="Company Logo">
+    <div class="receipt">
+        <?php if (!empty($companyData)): ?>
+            <div class="company-details">
+                <div class="logo-section">
+                    <img src="img/img.jpeg" alt="Company Logo">
+                </div>
+                <div>
+                    <p class="company-name">
+                        <strong><?php echo htmlspecialchars($companyData['company_name']); ?></strong>
+                    </p>
+                    <p class="contact-number">
+                        <strong><?php echo htmlspecialchars($companyData['contact_number']); ?></strong>
+                    </p>
+                </div>
             </div>
-            <div>
-                <p class="company-name">
-                    <strong><?php echo htmlspecialchars($companyData['company_name']); ?></strong>
-                </p>
-                <p class="contact-number">
-                    <strong><?php echo htmlspecialchars($companyData['contact_number']); ?></strong>
-                </p>
-            </div>
-        </div>
-    <?php endif; ?>
-
-    <hr />
-
-    <?php if (!empty($receiptData)): ?>
-        <div class="festival-details">
-            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['fname']); ?> <?php echo htmlspecialchars($receiptData['fspouse_name']); ?></strong></p><br>
-            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['ffestival_name']); ?></strong></p><br>
-            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['fplace']); ?></strong></p><br>
-            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['fdate']); ?></strong></p><br>
-        </div>
+        <?php endif; ?>
 
         <hr />
 
-        <div class="details">
-            <p style="line-height: 0.9;">
-                <strong>
-                    <span><?php echo $currentDateTime; ?></span>&emsp;&emsp;&emsp;<span><?php echo '#'.$id; ?></span>
-                </strong>
-            </p><br>
-            <p style="line-height: 0.9;"><?php echo htmlspecialchars($receiptData['place']); ?></p><br>
-            <p style="line-height: 0.9;">
-        <strong><?php echo htmlspecialchars($receiptData['name']); ?></strong>
-        <?php if (!empty($receiptData['profession'])): ?>
-            (<?php echo htmlspecialchars($receiptData['profession']); ?>)
-        <?php endif; ?>
-    </p><br>
+        <?php if (!empty($receiptData)): ?>
+            <div class="festival-details">
+                <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['fname']); ?> <?php echo htmlspecialchars($receiptData['fspouse_name']); ?></strong></p><br>
+                <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['ffestival_name']); ?></strong></p><br>
+                <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['fplace']); ?></strong></p><br>
+                <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['fdate']); ?></strong></p><br>
+            </div>
 
-    <?php if (!empty($receiptData['spouse_name'])): ?>
-        <p style="line-height: 0.9;">
-            <strong><?php echo htmlspecialchars($receiptData['spouse_name']); ?></strong>
-            <?php if (!empty($receiptData['profession1'])): ?>
-                (<?php echo htmlspecialchars($receiptData['profession1']); ?>)
-            <?php endif; ?>
-        </p><br>
-    <?php endif; ?>
-            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['contactNumber']); ?></strong></p><br>
-            <!-- <p style="line-height: 0.9;"><?php echo htmlspecialchars($receiptData['relative_name']); ?></p> -->
-        </div>
+            <hr />
 
-        <br />
+            <div class="details">
+                <p style="line-height: 0.9;">
+                    <strong>
+                        <span><?php echo $currentDateTime; ?></span>&emsp;&emsp;&emsp;<span><?php echo '#' . $no; ?></span>
+                    </strong>
+                </p><br>
+                <p style="line-height: 0.9;"><?php echo htmlspecialchars($receiptData['place']); ?></p><br>
+                <p style="line-height: 0.9;">
+                    <strong><?php echo htmlspecialchars($receiptData['name']); ?></strong>
+                    <?php if (!empty($receiptData['profession'])): ?>
+                        (<?php echo htmlspecialchars($receiptData['profession']); ?>)
+                    <?php endif; ?>
+                </p><br>
 
-        <!-- Denomination Table -->
-        <table id="amountTable">
-            <thead>
-                <tr>
-                    <th colspan="3" style="text-align:center">Denomination</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php 
-                // Array of denomination values
-                $denominations = [
-                    '500' => $receiptData['fivehundred'],
-                    '200' => $receiptData['twohundred'],
-                    '100' => $receiptData['hundred'],
-                    '50' => $receiptData['fiftyrupees'],
-                    '20' => $receiptData['twentyrupees'],
-                    '10' => $receiptData['tenrupees'],
-                    '1' => $receiptData['onerupees']
-                ];
-                $totalAmount = 0;
+                <?php if (!empty($receiptData['spouse_name'])): ?>
+                    <p style="line-height: 0.9;">
+                        <strong><?php echo htmlspecialchars($receiptData['spouse_name']); ?></strong>
+                        <?php if (!empty($receiptData['profession1'])): ?>
+                            (<?php echo htmlspecialchars($receiptData['profession1']); ?>)
+                        <?php endif; ?>
+                    </p><br>
+                <?php endif; ?>
+                <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['contactNumber']); ?></strong></p><br>
+                <!-- <p style="line-height: 0.9;"><?php echo htmlspecialchars($receiptData['relative_name']); ?></p> -->
+            </div>
 
-                // Loop through each denomination
-                foreach ($denominations as $denomination => $quantity) {
-                    if ($quantity > 0) {
-                        $lineTotal = $denomination * $quantity;
-                        $totalAmount += $lineTotal;
-                ?>
-                <tr>
-                    <td><?php echo $denomination; ?></td>
-                    <td><?php echo $quantity; ?></td>
-                    <td><?php echo number_format($lineTotal, 0); ?></td>
-                </tr>
-                <?php
+            <br />
+
+            <!-- Denomination Table -->
+            <table id="amountTable">
+                <thead>
+                    <tr>
+                        <th colspan="3" style="text-align:center">Denomination</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    // Array of denomination values
+                    $denominations = [
+                        '500' => $receiptData['fivehundred'],
+                        '200' => $receiptData['twohundred'],
+                        '100' => $receiptData['hundred'],
+                        '50' => $receiptData['fiftyrupees'],
+                        '20' => $receiptData['twentyrupees'],
+                        '10' => $receiptData['tenrupees'],
+                        '1' => $receiptData['onerupees']
+                    ];
+                    $totalAmount = 0;
+
+                    // Loop through each denomination
+                    foreach ($denominations as $denomination => $quantity) {
+                        if ($quantity > 0) {
+                            $lineTotal = $denomination * $quantity;
+                            $totalAmount += $lineTotal;
+                    ?>
+                            <tr>
+                                <td><?php echo $denomination; ?></td>
+                                <td><?php echo $quantity; ?></td>
+                                <td><?php echo number_format($lineTotal, 0); ?></td>
+                            </tr>
+                    <?php
+                        }
                     }
-                }
-                ?>
-            </tbody>
-        </table>
+                    ?>
+                </tbody>
+            </table>
 
-        <div class="total">
-            <p><strong>ரூ. <?php echo number_format($totalAmount, 0); ?></strong></p>
-        </div><br>
+            <div class="total">
+                <p><strong>ரூ. <?php echo number_format($totalAmount, 0); ?></strong></p>
+            </div><br>
 
-        <div>
-            <p style="line-height: 0.5;">&emsp;<strong>எழுத்தர்:</strong> <?php echo $userName; ?></p>
-        </div><br>
+            <div>
+                <p style="line-height: 0.5;">&emsp;<strong>எழுத்தர்:</strong> <?php echo $userName; ?></p>
+            </div><br>
 
-        <div>
-            <p style="line-height: 0.5;">&emsp;தங்கள் நல்வரவுக்கு <br><br><br>&nbsp;&nbsp;&nbsp;&nbsp;நன்றி</p>
-        </div><br>
+            <div>
+                <p style="line-height: 0.5;">&emsp;தங்கள் நல்வரவுக்கு <br><br><br>&nbsp;&nbsp;&nbsp;&nbsp;நன்றி</p>
+            </div><br>
 
-        <div class="print-button">
-            <button type="button"class="btn btn-primary" onclick="printAndRedirect()">Print Receipt</button>
-        </div>
-    <?php else: ?>
-        <p>No receipt data available.</p>
-    <?php endif; ?>
-</div>
+            <div class="print-button">
+                <button type="button" class="btn btn-primary" onclick="printAndRedirect()">Print Receipt</button>
+            </div>
+        <?php else: ?>
+            <p>No receipt data available.</p>
+        <?php endif; ?>
+    </div>
 
     <script>
         function printAndRedirect() {
             window.print();
             setTimeout(function() {
                 window.location.href = 'moi.php?moi_id=<?php echo $moi_id; ?>';
-            }, 1000); 
+            }, 1000);
         }
+
         function updateTable() {
             const rows = document.querySelectorAll('#amountTable tbody tr');
             let grandTotal = 0;
 
             rows.forEach(row => {
-                
+
                 const amountCell = row.querySelector('.amount');
                 const quantityInput = row.querySelector('.quantity');
                 const totalCell = row.querySelector('.total');
@@ -337,11 +345,8 @@ $currentDateTime = date("Y-m-d h:i A");
         document.querySelectorAll('.quantity').forEach(p => {
             p.addEventListener('p', updateTable);
         });
-        
     </script>
-    
-</body>    
+
+</body>
+
 </html>
-
-
-
