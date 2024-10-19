@@ -218,12 +218,21 @@ $currentDateTime = date("Y-m-d h:i A");
                 </strong>
             </p><br>
             <p style="line-height: 0.9;"><?php echo htmlspecialchars($receiptData['place']); ?></p><br>
-            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['name']); ?></strong> (<?php echo htmlspecialchars($receiptData['profession']); ?>)</p><br>
+            <p style="line-height: 0.9;">
+        <strong><?php echo htmlspecialchars($receiptData['name']); ?></strong>
+        <?php if (!empty($receiptData['profession'])): ?>
+            (<?php echo htmlspecialchars($receiptData['profession']); ?>)
+        <?php endif; ?>
+    </p><br>
 
-            <?php if ($receiptData['spouse_name'] != ''): ?>
-                <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['spouse_name']); ?></strong> (<?php echo htmlspecialchars($receiptData['profession1']); ?>)</p><br>
+    <?php if (!empty($receiptData['spouse_name'])): ?>
+        <p style="line-height: 0.9;">
+            <strong><?php echo htmlspecialchars($receiptData['spouse_name']); ?></strong>
+            <?php if (!empty($receiptData['profession1'])): ?>
+                (<?php echo htmlspecialchars($receiptData['profession1']); ?>)
             <?php endif; ?>
-
+        </p><br>
+    <?php endif; ?>
             <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($receiptData['contactNumber']); ?></strong></p><br>
             <!-- <p style="line-height: 0.9;"><?php echo htmlspecialchars($receiptData['relative_name']); ?></p> -->
         </div>

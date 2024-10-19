@@ -88,21 +88,31 @@ if (isset($_GET['close_id'])) {
     }
 }
 
-// Handle assigning user to festival
 if (isset($_POST['assign_festival'])) {
     $festival_id = $_POST['festival_id'];
-    $user_id = $_POST['user_id'];
 
-    // Assign user to the selected festival
-    $assign_query = "INSERT INTO user_festival_assignment (user_id, festival_id) VALUES ('$user_id', '$festival_id')";
-    if (mysqli_query($conn, $assign_query)) {
-        $_SESSION['message'] = "<div class='alert alert-success'>User assigned successfully!</div>";
+    if (isset($_POST['user_ids']) && !empty($_POST['user_id'])) {
+        $user_ids = $_POST['user_ids']; // This is now an array of user IDs
+
+        foreach ($user_ids as $user_id) {
+            $assign_query = "INSERT INTO user_festival_assignment (user_id, festival_id) VALUES ('$user_id', '$festival_id')";
+            if (!mysqli_query($conn, $assign_query)) {
+                // Handle errors for each user assignment if needed
+                $_SESSION['message'] = "<div class='alert alert-danger'>Error assigning user ID $user_id</div>";
+                header("Location: display.php");
+                exit;
+            }
+        }
+
+        $_SESSION['message'] = "<div class='alert alert-success'>Users assigned successfully!</div>";
     } else {
-        $_SESSION['message'] = "<div class='alert alert-danger'>Error assigning user</div>";
+        $_SESSION['message'] = "<div class='alert alert-danger'>No users selected.</div>";
     }
+
     header("Location: display.php");
     exit;
 }
+
 
 ?>
 
@@ -182,7 +192,6 @@ if (isset($_POST['assign_festival'])) {
         <a href="moidisplay.php?festival_id=<?php echo $row['id']; ?>" class="btn btn-warning">List</a>
     <?php } ?>
 </td>
-
                         </tr>
                     <?php
                     }
@@ -245,74 +254,95 @@ if (isset($_POST['assign_festival'])) {
     <!-- Assign Modal -->
     <!-- Modal -->
     <div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="assignModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="assignModalLabel">Assign Active User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="assignForm" method="POST">
-                        <input type="hidden" name="festival_id" id="festival_id">
-                        <div class="form-group">
-                            <label for="user_id">Select Active User:</label>
-                            <select id="user_id" name="user_id" class="form-control">
-                                <?php
-                                $user_res = mysqli_query($conn, "SELECT id, username FROM users WHERE status = '1'");
-                                while ($user_row = mysqli_fetch_assoc($user_res)) { ?>
-                                    <option value="<?php echo $user_row['id']; ?>"><?php echo $user_row['username']; ?></option>
-                                <?php } ?>
-                            </select>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignModalLabel">Assign Active Users</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="assignForm" method="POST">
+                    <input type="hidden" name="festival_id" id="festival_id">
+                    <div class="form-group">
+                        <label for="user_ids">Select Active Users:</label>
+                        <div id="user_ids">
+                            <?php
+                            $user_res = mysqli_query($conn, "SELECT id, username FROM users WHERE status = '1'");
+                            while ($user_row = mysqli_fetch_assoc($user_res)) { ?>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="user_id[]" value="<?php echo $user_row['id']; ?>" id="user_<?php echo $user_row['id']; ?>">
+                                    <label class="form-check-label" for="user_<?php echo $user_row['id']; ?>">
+                                        <?php echo htmlspecialchars($user_row['username']); ?>
+                                    </label>
+                                </div>
+                            <?php } ?>
                         </div>
-                        <div class="form-group mt-3">
-                            <button type="submit" class="btn btn-primary">Assign</button>
-                        </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <button type="submit" class="btn btn-primary">Assign</button>
+                    </div>
+                </form>
+                <div id="message" class="alert alert-success mt-3" style="display:none;"></div> <!-- Message display -->
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        // Pass festival_id to the modal when the Assign button is clicked
-        var assignModal = document.getElementById('assignModal');
-        assignModal.addEventListener('show.bs.modal', function(event) {
-            var button = event.relatedTarget;
-            var festivalId = button.getAttribute('data-id');
-            var modalInput = assignModal.querySelector('#festival_id');
-            modalInput.value = festivalId;
+<script>
+    // Pass festival_id to the modal when the Assign button is clicked
+    var assignModal = document.getElementById('assignModal');
+    assignModal.addEventListener('show.bs.modal', function(event) {
+        var button = event.relatedTarget;
+        var festivalId = button.getAttribute('data-id');
+        var modalInput = assignModal.querySelector('#festival_id');
+        modalInput.value = festivalId;
+    });
+
+    // Handle form submission
+    document.getElementById('assignForm').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent default form submission
+        var form = this;
+        var festivalId = form.festival_id.value;
+
+        // Gather selected user IDs
+        var selectedUsers = [];
+        var checkboxes = form.querySelectorAll('input[name="user_id[]"]:checked');
+        checkboxes.forEach(function(checkbox) {
+            selectedUsers.push(checkbox.value);
         });
 
-        // Handle form submission (optional: you can handle it via AJAX)
-        document.getElementById('assignForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            var form = this;
-            var festivalId = form.festival_id.value;
-            var userId = form.user_id.value;
+        // Check if at least one user is selected
+        if (selectedUsers.length === 0) {
+            alert('Please select at least one user.');
+            return; // Stop execution if no user is selected
+        }
 
-            // AJAX request to handle the assignment
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "assign.php", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    alert('User assigned successfully!');
-                    // Optionally close the modal
-                    var modal = bootstrap.Modal.getInstance(assignModal);
-                    modal.hide();
-                }
-            };
-            xhr.send("festival_id=" + festivalId + "&user_id=" + userId);
-        });
-
-        // Automatically hide the success message after 20 seconds
-        setTimeout(function() {
-            var message = document.getElementById('message');
-            if (message) {
-                message.style.display = 'none';
+        // AJAX request to handle the assignment
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "assign.php", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                alert('Users assigned successfully!');
+                // Optionally close the modal
+                var modal = bootstrap.Modal.getInstance(assignModal);
+                modal.hide();
             }
-        }, 10000); // 20 seconds in milliseconds
-    </script>
+        };
+
+        // Send the request with festival ID and selected user IDs
+        xhr.send("festival_id=" + festivalId + "&user_ids=" + JSON.stringify(selectedUsers));
+    });
+
+    // Automatically hide the success message after 10 seconds
+    setTimeout(function() {
+        var message = document.getElementById('message');
+        if (message) {
+            message.style.display = 'none';
+        }
+    }, 10000); // 10 seconds in milliseconds
+</script>
+
 </body>
 
 </html>

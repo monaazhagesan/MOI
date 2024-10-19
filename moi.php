@@ -1,51 +1,73 @@
 <?php
 include "config.php";
 include "header.php";
-
+error_reporting(E_ALL);
 $moi_id = isset($_GET['moi_id']) ? intval($_GET['moi_id']) : null;
 
 if (isset($_POST["submit"])) {
+    // Retrieve form inputs
     $contactNumber = $_POST['contactNumber'];
     $name = $_POST['name'];
     $profession = $_POST['profession'];
     $spouse_name = $_POST['spouse_name'];
     $profession1 = $_POST['profession1'];
     $relative_name = $_POST['relative_name'];
-    // if ($relative_name === 'other') {
-    //     $relative_name = $_POST['other_relative_name'];
-    // }
     $place = $_POST['place'];
-    $fivehundred = $_POST['fivehundred'];
-    $twohundred = $_POST['twohundred'];
-    $hundred = $_POST['hundred'];
-    $fiftyrupees = $_POST['fiftyrupees'];
-    $twentyrupees = $_POST['twentyrupees'];
-    $tenrupee = $_POST['tenrupee'];
-    $onerupee = $_POST['onerupee'];
-    $amount = $_POST['amount'];
-    $festival_id = $_POST['festival_id'];
+    $fivehundred = (int) ($_POST['fivehundred'] ?? 0);
+    $twohundred = (int) ($_POST['twohundred'] ?? 0);
+    $hundred = (int) ($_POST['hundred'] ?? 0);
+    $fiftyrupees = (int) ($_POST['fiftyrupees'] ?? 0);
+    $twentyrupees = (int) ($_POST['twentyrupees'] ?? 0);
+    $tenrupee = (int) ($_POST['tenrupee'] ?? 0);
+    $onerupee = (int) ($_POST['onerupee'] ?? 0);
+    $amount = (int) ($_POST['amount'] ?? 0);
 
-    $user_id = $_SESSION['id'];
-
-    // Prepare and bind
-    $query = $conn->prepare("INSERT INTO mrg(contactNumber, name, profession, spouse_name, profession1, relative_name, place, fivehundred, twohundred, hundred, fiftyrupees, twentyrupees, tenrupee, onerupee, amount, user_id, festival_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $query->bind_param("ssssssssssssssiii", $contactNumber, $name, $profession, $spouse_name, $profession1, $relative_name, $place, $fivehundred, $twohundred, $hundred, $fiftyrupees, $twentyrupees, $tenrupee, $onerupee, $amount, $user_id, $festival_id);
-
-    // Execute and handle result
-    if ($query->execute()) {
-        $inserted_id = $conn->insert_id;
-        // Redirect to print_receipt.php with festival_id and moi_id
-        header("Location: print_receipt.php?festival_id=$festival_id&moi_id=$moi_id&id=$inserted_id");
-        exit();
+    // Validate festival_id
+    if (isset($_POST['festival_id']) && is_numeric($_POST['festival_id']) && $_POST['festival_id'] > 0) {
+        $festival_id = (int) $_POST['festival_id'];
     } else {
-        // Show error message if insertion fails
-        $error_message = $query->error;
-        echo "<script>alert('Registration failed. Error: $error_message'); window.location.href='moi.php';</script>";
+        // If the festival_id is missing or invalid, display an error and stop
+        echo '<script>alert("Missing or invalid Festival ID."); window.location.href="moi.php";</script>';
+        exit();
     }
 
-    $query->close();
-    $conn->close();
+    $user_id = $_SESSION['id']; // Fetch the user ID from session
+
+    // Check if at least one rupee denomination is entered
+    if ($fivehundred > 0 || $twohundred > 0 || $hundred > 0 || $fiftyrupees > 0 || $twentyrupees > 0 || $tenrupee > 0 || $onerupee > 0) {
+        // Prepare and bind SQL query
+        $query = $conn->prepare("INSERT INTO mrg(contactNumber, name, profession, spouse_name, profession1, relative_name, place, fivehundred, twohundred, hundred, fiftyrupees, twentyrupees, tenrupee, onerupee, amount, user_id, festival_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $query->bind_param("ssssssssssssssiii", $contactNumber, $name, $profession, $spouse_name, $profession1, $relative_name, $place, $fivehundred, $twohundred, $hundred, $fiftyrupees, $twentyrupees, $tenrupee, $onerupee, $amount, $user_id, $festival_id);
+
+        // Execute and handle result
+        try {
+            if ($query->execute()) {
+                $inserted_id = $conn->insert_id;
+                // Redirect to print_receipt.php with festival_id and moi_id
+                header("Location: print_receipt.php?festival_id=$festival_id&moi_id=$moi_id&id=$inserted_id");
+                exit();
+            } else {
+                // Show error message if insertion fails
+                $error_message = $query->error;
+                echo '<script>alert("Registration failed. Error: '.$error_message.'"); window.location.href="moi.php";</script>';
+            }
+        } catch (\Throwable $th) {
+            // Handle any unexpected errors
+            $error_message = $query->error;
+            echo '<script>alert("Registration failed. Error: '.$error_message.'"); window.location.href="moi.php";</script>';
+        }
+
+        // Close query and connection
+        $query->close();
+        $conn->close();
+    } else {
+        // Alert for at least one rupee denomination
+        echo '<script>alert("Please enter at least one rupee denomination!"); window.location.href="moi.php";</script>';
+    }
 }
+
+
+
 $admin_res = mysqli_query($conn, "SELECT * FROM company_details");
 $admin = mysqli_fetch_assoc($admin_res);
 $currentUsername = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest';
@@ -172,21 +194,21 @@ if ($total_amount === null) {
     </div>
     <div class="form-group">
         <label for="profession">தொழில்</label>
-        <input type="text" class="form-control" id="profession" name="profession" required>
+        <input type="text" class="form-control" id="profession" name="profession" >
     </div>
     <div class="form-group">
         <label for="spouse_name">துணைவி பெயர்</label>
-        <input type="text" class="form-control" id="spouse_name" name="spouse_name"required>
+        <input type="text" class="form-control" id="spouse_name" name="spouse_name">
     </div>
     <div class="form-group">
         <label for="profession1">தொழில்</label>
-        <input type="text" class="form-control" id="profession1" name="profession1" required>
+        <input type="text" class="form-control" id="profession1" name="profession1" >
     </div>
     <div class="form-group">
     <div class="form-group">
     <label for="relative_name">உறவுமுறை பெயர்</label>
     <div class="input-group">
-        <select class="form-control custom-select-with-icon" id="relative_name" name="relative_name" onchange="checkOtherOption()">
+        <select class="form-control custom-select-with-icon" id="relative_name" name="relative_name" onchange="checkOtherOption()" >
             <option value="" disabled selected>உறவுமுறை தேர்வு செய்க</option> <!-- Placeholder option -->
             <option value="உறவுமுறை">உறவுமுறை</option>
             <option value="தாய்மாமன்">தாய்மாமன்</option>
@@ -221,55 +243,46 @@ if ($total_amount === null) {
         <label for="place">ஊர்</label>
         <input type="text" class="form-control" id="place" name="place" required>
     </div>
-    <div class="form-group">
-        <label for="moi_amount"> மொய்</label>
-        <input type="number" class="form-control" id="moi_amount" name="moi_amount" required>
-    </div>
+   
 </div>
 
                 <!-- Right Column -->
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="fivehundred">500 ரூபாய்:</label>
-                        <input type="number" id="fivehundred" name="fivehundred" min="0" value="0"
-                            oninput="calculateTotal()">
-                    </div>
-                    <div class="form-group">
-                        <label for="twohundred">200 ரூபாய்:</label>
-                        <input type="number" id="twohundred" name="twohundred" min="0" value="0"
-                            oninput="calculateTotal()">
-                    </div>
-                    <div class="form-group">
-                        <label for="hundred">100 ரூபாய்:</label>
-                        <input type="number" id="hundred" name="hundred" min="0" value="0" oninput="calculateTotal()">
-                    </div>
-                    <div class="form-group">
-                        <label for="fiftyrupees">50 ரூபாய்:</label>
-                        <input type="number" id="fiftyrupees" name="fiftyrupees" min="0" value="0"
-                            oninput="calculateTotal()">
-                    </div>
-                    <div class="form-group">
-                        <label for="twentyrupees">20 ரூபாய்:</label>
-                        <input type="number" id="twentyrupees" name="twentyrupees" min="0" value="0"
-                            oninput="calculateTotal()">
-                    </div>
-                    <div class="form-group">
-                        <label for="tenrupee">10 ரூபாய்:</label>
-                        <input type="number" id="tenrupee" name="tenrupee" min="0" value="0" oninput="calculateTotal()">
-                    </div>
-                    <div class="form-group">
-                        <label for="onerupee">1 ரூபாய்:</label>
-                        <input type="number" id="onerupee" name="onerupee" min="0" value="0" oninput="calculateTotal()">
-                    </div>
+    <div class="form-group">
+        <label for="fivehundred">500 ரூபாய்:</label>
+        <input type="number" id="fivehundred" name="fivehundred" min="0" oninput="calculateTotal()">
+    </div>
+    <div class="form-group">
+        <label for="twohundred">200 ரூபாய்:</label>
+        <input type="number" id="twohundred" name="twohundred" min="0" oninput="calculateTotal()">
+    </div>
+    <div class="form-group">
+        <label for="hundred">100 ரூபாய்:</label>
+        <input type="number" id="hundred" name="hundred" min="0" oninput="calculateTotal()">
+    </div>
+    <div class="form-group">
+        <label for="fiftyrupees">50 ரூபாய்:</label>
+        <input type="number" id="fiftyrupees" name="fiftyrupees" min="0" oninput="calculateTotal()">
+    </div>
+    <div class="form-group">
+        <label for="twentyrupees">20 ரூபாய்:</label>
+        <input type="number" id="twentyrupees" name="twentyrupees" min="0" oninput="calculateTotal()">
+    </div>
+    <div class="form-group">
+        <label for="tenrupee">10 ரூபாய்:</label>
+        <input type="number" id="tenrupee" name="tenrupee" min="0" oninput="calculateTotal()">
+    </div>
+    <div class="form-group">
+        <label for="onerupee">1 ரூபாய்:</label>
+        <input type="number" id="onerupee" name="onerupee" min="0" oninput="calculateTotal()">
+    </div>
 
-                    <input type="hidden" id="amount" name="amount" value="0"><br><br><br>
-                    <div class="divider"></div>
-                    <div class="form-group result">
-                        மொத்த தொகை: <span id="total">0</span> ரூபாய்
-                    </div>
-                    
-                </div>
-              
+    <input type="hidden" id="amount" name="amount" value=""><br>
+    <div class="divider"></div>
+    <div class="form-group result">
+        மொத்த தொகை: <span id="total">0</span> ரூபாய்
+    </div>
+</div>
                 <div class="form-group result text-right mt-3">
     <!-- Table for Denominations Count -->
     <!-- <strong>Denominations Count for Festival ID <?php echo $festival_id; ?>:</strong><br><br> -->
@@ -448,3 +461,4 @@ if ($total_amount === null) {
 </body>
 
 </html>
+
