@@ -222,12 +222,21 @@ $conn->close();
             <p style="line-height: 0.9;"><strong><?php echo $currentDateTime; ?></strong>&emsp;&emsp;&emsp;<strong>#<?php echo $id; ?></strong>
             </p><br>
             <p style="line-height: 0.9;"><?php echo htmlspecialchars($place); ?></p><br>
-            <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($name); ?></strong>
-                (<?php echo htmlspecialchars($profession); ?>)</p><br>
-            <?php if ($spouse_name != ''): ?>
-                <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($spouse_name); ?></strong>
-                    (<?php echo htmlspecialchars($profession1); ?>)</p><br>
-            <?php endif; ?>
+            <p style="line-height: 0.9;">
+                    <strong><?php echo htmlspecialchars($receiptData['name']); ?></strong>
+                    <?php if (!empty($receiptData['profession'])): ?>
+                        (<?php echo htmlspecialchars($receiptData['profession']); ?>)
+                    <?php endif; ?>
+                </p><br>
+
+                <?php if (!empty($receiptData['spouse_name'])): ?>
+                    <p style="line-height: 0.9;">
+                        <strong><?php echo htmlspecialchars($receiptData['spouse_name']); ?></strong>
+                        <?php if (!empty($receiptData['profession1'])): ?>
+                            (<?php echo htmlspecialchars($receiptData['profession1']); ?>)
+                        <?php endif; ?>
+                    </p><br>
+                <?php endif; ?>
             <p style="line-height: 0.9;"><strong><?php echo htmlspecialchars($contactNumber); ?></strong></p><br>
             <!-- <p style="line-height: 0.9;"><?php echo htmlspecialchars($relative_name); ?></p> -->
         </div>
