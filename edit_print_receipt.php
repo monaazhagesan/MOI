@@ -70,7 +70,12 @@ $query->close();
 
 $currentDateTime = date("Y-m-d h:i A");
 
-// Close the database connection
+$query = $conn->prepare("SELECT COUNT(*) AS mrg_count FROM mrg WHERE festival_id = $festival_id 
+AND id >= (SELECT MIN(id) FROM mrg WHERE festival_id = $festival_id LIMIT 1) 
+AND id <= $id LIMIT 1");
+$query->execute();
+$result = $query->get_result()->fetch_assoc();
+$no = $result['mrg_count'];
 $conn->close();
 ?>
 
@@ -219,7 +224,7 @@ $conn->close();
         <hr>
 
         <div class="details">
-            <p style="line-height: 0.9;"><strong><?php echo $currentDateTime; ?></strong>&emsp;&emsp;&emsp;<strong>#<?php echo $id; ?></strong>
+            <p style="line-height: 0.9;"><strong><?php echo $currentDateTime; ?></strong>&emsp;&emsp;&emsp;<strong>#<?php echo $no; ?></strong>
             </p><br>
             <p style="line-height: 0.9;"><?php echo htmlspecialchars($place); ?></p><br>
             <p style="line-height: 0.9;">

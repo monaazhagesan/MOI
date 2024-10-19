@@ -66,8 +66,6 @@ if (isset($_POST["submit"])) {
     }
 }
 
-
-
 $admin_res = mysqli_query($conn, "SELECT * FROM company_details");
 $admin = mysqli_fetch_assoc($admin_res);
 $currentUsername = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest';
