@@ -1,7 +1,7 @@
 <?php
+error_reporting(E_ALL);
 include "config.php"; // Include your database connection
 include "header.php"; // Include your header
-error_reporting(E_ALL);
 
 if (session_status() == PHP_SESSION_NONE) {
     session_start(); 
@@ -11,6 +11,7 @@ if (session_status() == PHP_SESSION_NONE) {
 $moi_id = isset($_GET['moi_id']) ? intval($_GET['moi_id']) : null;
 
 if (isset($_POST["submit"])) {
+    
     // Retrieve form inputs with default values
     $contactNumber = $_POST['contactNumber'] ?? '';
     $name = $_POST['name'] ?? '';
@@ -77,7 +78,6 @@ if (isset($_POST["submit"])) {
 }
 
 
-
 // Fetch company details for display
 $admin_res = mysqli_query($conn, "SELECT * FROM company_details");
 $admin = mysqli_fetch_assoc($admin_res);
@@ -124,7 +124,6 @@ if ($total_amount === null) {
 }
 ?>
 
-<!DOCTYPE html>
 <html lang="en">
 
 <head>

@@ -258,49 +258,48 @@ if ($total_amount === null) {
                                 </div>
                             </div>
                             <div class="col-6">  
-    <div class="form-group">
-        <label for="edit-relative-name" style="font-weight: normal;">உறவுமுறை பெயர்</label>
-        <div class="input-group">
-            <select class="form-control custom-select-with-icon" id="relative_name" name="relative_name" onchange="checkOtherOption()">
-                <option value="" disabled selected>உறவுமுறை தேர்வு செய்க</option> <!-- Placeholder option -->
-                <option value="உறவுமுறை">உறவுமுறை</option>
-                <option value="தாய்மாமன்">தாய்மாமன்</option>
-                <option value="other">மற்றவை</option>
-            </select>
-        </div>
-        <br><div class="form-group" id="otherRelativeInput" style="display: none;">
-            <label for="otherRelative" style="font-weight: normal;">மேலும் தகவல்</label>
-            <select class="form-control custom-select-with-icon" id="otherRelative" name="other_relative">
-                <option value="" disabled selected>உறவுமுறை தேர்வு செய்க</option>
-                <option value="அப்பா (தாய்மாமன்)">அப்பா (தாய்மாமன்)</option>
-                <option value="அம்மா (தாய்மாமன்)">அம்மா (தாய்மாமன்)</option>
-                <option value="சகோதரர் (தாய்மாமன்)">சகோதரர் (தாய்மாமன்)</option>
-                <option value="சகோதரி (தாய்மாமன்)">சகோதரி (தாய்மாமன்)</option>
-                <option value="மாமா (தாய்மாமன்)">மாமா (தாய்மாமன்)</option>
-                <option value="மாமி (தாய்மாமன்)">மாமி (தாய்மாமன்)</option>
-                <option value="அண்ணன் (தாய்மாமன்)">அண்ணன் (தாய்மாமன்)</option>
-                <option value="அக்கா (தாய்மாமன்)">அக்கா (தாய்மாமன்)</option>
-                <option value="தங்கை (தாய்மாமன்)">தங்கை (தாய்மாமன்)</option>
-                <option value="தம்பி (தாய்மாமன்)">தம்பி (தாய்மாமன்)</option>
-                <option value="other">மற்றவை</option>
-            </select>
-        </div>
-    </div>
+                                <div class="form-group">
+                                    <label for="edit-relative-name" style="font-weight: normal;">உறவுமுறை பெயர்</label>
+                                    <div class="input-group">
+                                        <select class="form-control custom-select-with-icon" id="relative_name" name="relative_name" onchange="checkOtherOption()">
+                                            <option value="" disabled selected>உறவுமுறை தேர்வு செய்க</option> <!-- Placeholder option -->
+                                            <option value="உறவுமுறை">உறவுமுறை</option>
+                                            <option value="தாய்மாமன்">தாய்மாமன்</option>
+                                            <option value="other">மற்றவை</option>
+                                        </select>
+                                    </div><br>
+                                    <div class="form-group" id="otherRelativeInput" style="display: none; font-weight: normal;">
+                                        <label for="otherRelative" style="font-weight: normal;" >மேலும் தகவல்</label>
+                                        <select class="form-control custom-select-with-icon" id="" name="relative_name" onchange="checkOtherOption()">
+                                            <option value="" disabled selected>உறவுமுறை தேர்வு செய்க</option>
+                                            <option value="அப்பா (தாய்மாமன்)">அப்பா (தாய்மாமன்)</option>
+                                            <option value="அம்மா (தாய்மாமன்)">அம்மா (தாய்மாமன்)</option>
+                                            <option value="சகோதரர் (தாய்மாமன்)">சகோதரர் (தாய்மாமன்)</option>
+                                            <option value="சகோதரி (தாய்மாமன்)">சகோதரி (தாய்மாமன்)</option>
+                                            <option value="மாமா (தாய்மாமன்)">மாமா (தாய்மாமன்)</option>
+                                            <option value="மாமி (தாய்மாமன்)">மாமி (தாய்மாமன்)</option>
+                                            <option value="அண்ணன் (தாய்மாமன்)">அண்ணன் (தாய்மாமன்)</option>
+                                            <option value="அக்கா (தாய்மாமன்)">அக்கா (தாய்மாமன்)</option>
+                                            <option value="தங்கை (தாய்மாமன்)">தங்கை (தாய்மாமன்)</option>
+                                            <option value="தம்பி (தாய்மாமன்)">தம்பி (தாய்மாமன்)</option>
+                                            <option value="other">மற்றவை</option>
+                                        </select>
+                                    </div>
+                                </div>
 
-    <div class="mb-3">
-        <label for="edit-place" class="form-label" style="font-weight: normal;">ஊர் <span class="text-danger">*</span></label>
-        <input type="text" class="form-control" id="edit-place" name="place" required>
-    </div>
-    <div class="mb-3">
-        <label for="edit-contactnumber" class="form-label" style="font-weight: normal;">தொடர்புஎண்</label>
-        <input type="text" class="form-control" id="edit-contactnumber" name="contactNumber">
-    </div>
-    <div class="mb-3">
-        <label for="edit-amount" class="form-label" style="font-weight: normal;">மொத்தம்: ரூபாய் <span class="text-danger">*</span></label>
-        <input type="number" class="form-control" id="edit-amount" name="amount" required>
-    </div>
-</div>
-
+                                <div class="mb-3">
+                                    <label for="edit-place" class="form-label">ஊர் <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="edit-place" name="place" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-contactnumber" class="form-label">தொடர்புஎண்</label>
+                                    <input type="text" class="form-control" id="edit-contactnumber" name="contactNumber">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="edit-amount" class="form-label">மொத்தம்: ரூபாய் <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="edit-amount" name="amount" required>
+                                </div>
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-primary">Update</button> &emsp;&emsp;
 
@@ -363,14 +362,13 @@ if ($total_amount === null) {
         }
     }
 
-
     function printReceipt() {
         var id = document.getElementById('edit-id').value;
         var name = document.getElementById('edit-name').value;
         var profession = document.getElementById('edit-profession').value;
         var spouseName = document.getElementById('edit-spouse-name').value;
         var profession1 = document.getElementById('edit-profession1').value;
-        var relativeName = document.getElementById('edit-relative-name').value;
+        // var relativeName = document.getElementById('edit-relative-name').value;
         var place = document.getElementById('edit-place').value;
         var contactNumber = document.getElementById('edit-contactnumber').value;
         var amount = document.getElementById('edit-amount').value;
@@ -382,7 +380,7 @@ if ($total_amount === null) {
             '&profession=' + encodeURIComponent(profession) +
             '&spouse_name=' + encodeURIComponent(spouseName) +
             '&profession1=' + encodeURIComponent(profession1) +
-            '&relative_name=' + encodeURIComponent(relativeName) +
+            // '&relative_name=' + encodeURIComponent(relativeName) +
             '&place=' + encodeURIComponent(place) +
             '&contact_number=' + encodeURIComponent(contactNumber) +
             '&amount=' + encodeURIComponent(amount) +
@@ -392,10 +390,5 @@ if ($total_amount === null) {
     }
 </script>
 
-<style>
-    .form-group label {
-    font-weight: normal;
-    
-}
-</style>
+
 <?php include('footer.php'); ?>
