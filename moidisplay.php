@@ -68,6 +68,7 @@ if ($total_amount === null) {
     $total_onerupee = 0;
 }
 
+
 ?>
 <style>
     .form-group label {
@@ -240,8 +241,8 @@ if ($total_amount === null) {
                         <div class="row">
                             <div class="col-6">
                                 <div class="mb-3">
-                                    <label for="edit-name" class="form-label">பெயர்</label>
-                                    <input type="text" class="form-control" id="edit-name" name="name">
+                                    <label for="edit-name" class="form-label">பெயர் <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="edit-name" name="name" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="edit-profession" class="form-label">தொழில்</label>
@@ -256,31 +257,50 @@ if ($total_amount === null) {
                                     <input type="text" class="form-control" id="edit-profession1" name="profession1">
                                 </div>
                             </div>
-                            <div class="col-6">
-                               
-                                <div class="mb-3">
-                                <label for="edit-relative-name" class="form-label">உறவுமுறை பெயர்</label>
-                                <select class="form-select"  id="edit-relative-name" name="relative_name">
-                                        <option value="" disabled selected>உறவுமுறை தேர்வு செய்க</option> <!-- Placeholder option -->
-                                        <option value="உறவுமுறை">உறவுமுறை</option>
-                                        <option value="தாய்மாமன்">தாய்மாமன்</option>
-                                        <option value="other">மற்றவை</option>
-                                    </select>
-                                </div>
+                            <div class="col-6">  
+    <div class="form-group">
+        <label for="edit-relative-name" style="font-weight: normal;">உறவுமுறை பெயர்</label>
+        <div class="input-group">
+            <select class="form-control custom-select-with-icon" id="relative_name" name="relative_name" onchange="checkOtherOption()">
+                <option value="" disabled selected>உறவுமுறை தேர்வு செய்க</option> <!-- Placeholder option -->
+                <option value="உறவுமுறை">உறவுமுறை</option>
+                <option value="தாய்மாமன்">தாய்மாமன்</option>
+                <option value="other">மற்றவை</option>
+            </select>
+        </div>
+        <br><div class="form-group" id="otherRelativeInput" style="display: none;">
+            <label for="otherRelative" style="font-weight: normal;">மேலும் தகவல்</label>
+            <select class="form-control custom-select-with-icon" id="otherRelative" name="other_relative">
+                <option value="" disabled selected>உறவுமுறை தேர்வு செய்க</option>
+                <option value="அப்பா (தாய்மாமன்)">அப்பா (தாய்மாமன்)</option>
+                <option value="அம்மா (தாய்மாமன்)">அம்மா (தாய்மாமன்)</option>
+                <option value="சகோதரர் (தாய்மாமன்)">சகோதரர் (தாய்மாமன்)</option>
+                <option value="சகோதரி (தாய்மாமன்)">சகோதரி (தாய்மாமன்)</option>
+                <option value="மாமா (தாய்மாமன்)">மாமா (தாய்மாமன்)</option>
+                <option value="மாமி (தாய்மாமன்)">மாமி (தாய்மாமன்)</option>
+                <option value="அண்ணன் (தாய்மாமன்)">அண்ணன் (தாய்மாமன்)</option>
+                <option value="அக்கா (தாய்மாமன்)">அக்கா (தாய்மாமன்)</option>
+                <option value="தங்கை (தாய்மாமன்)">தங்கை (தாய்மாமன்)</option>
+                <option value="தம்பி (தாய்மாமன்)">தம்பி (தாய்மாமன்)</option>
+                <option value="other">மற்றவை</option>
+            </select>
+        </div>
+    </div>
 
-                                <div class="mb-3">
-                                    <label for="edit-place" class="form-label">ஊர்</label>
-                                    <input type="text" class="form-control" id="edit-place" name="place">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="edit-contactnumber" class="form-label">தொடர்புஎண்</label>
-                                    <input type="text" class="form-control" id="edit-contactnumber" name="contactNumber">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="edit-amount" class="form-label">மொத்தம்: ரூபாய்</label>
-                                    <input type="text" class="form-control" id="edit-amount" name="amount">
-                                </div>
-                            </div>
+    <div class="mb-3">
+        <label for="edit-place" class="form-label" style="font-weight: normal;">ஊர் <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" id="edit-place" name="place" required>
+    </div>
+    <div class="mb-3">
+        <label for="edit-contactnumber" class="form-label" style="font-weight: normal;">தொடர்புஎண்</label>
+        <input type="text" class="form-control" id="edit-contactnumber" name="contactNumber">
+    </div>
+    <div class="mb-3">
+        <label for="edit-amount" class="form-label" style="font-weight: normal;">மொத்தம்: ரூபாய் <span class="text-danger">*</span></label>
+        <input type="number" class="form-control" id="edit-amount" name="amount" required>
+    </div>
+</div>
+
                         </div>
                         <button type="submit" class="btn btn-primary">Update</button> &emsp;&emsp;
 
@@ -298,8 +318,7 @@ if ($total_amount === null) {
 <script>
     var adminContactNumber = '<?php echo $admin['contact_number']; ?>';
     var adminCompanyName = '<?php echo $admin['company_name']; ?>';
-    // var isAdmin = <?php //echo json_encode($_SESSION['is_admin']); 
-                        ?>;
+
     function openEditUserModal(id) {
         fetch('get_moi.php?id=' + id)
             .then(response => response.json())
@@ -310,16 +329,40 @@ if ($total_amount === null) {
                 document.getElementById('edit-spouse-name').value = data.spouse_name;
                 document.getElementById('edit-profession').value = data.profession;
                 document.getElementById('edit-profession1').value = data.profession1;
-                document.getElementById('edit-relative-name').value = data.relative_name;
+                // document.getElementById('edit-relative-name').value = data.relative_name;
                 document.getElementById('edit-contactnumber').value = data.contactNumber;
                 document.getElementById('edit-place').value = data.place;
                 document.getElementById('edit-amount').value = data.amount;
+
+                // Show/hide the relative name select based on fetched data
+                checkOtherOption(data.relative_name); // Pass the selected value to checkOtherOption
 
                 var editUserModal = new bootstrap.Modal(document.getElementById('editUserModal'));
                 editUserModal.show();
             })
             .catch(error => console.error('Error:', error));
     }
+
+    function checkOtherOption() {
+        const relativeNameSelect = document.getElementById('relative_name');
+        const otherRelativeInput = document.getElementById('otherRelativeInput');
+        const selectedValue = relativeNameSelect.value;
+
+        // Show the additional input field based on selection
+        if (selectedValue === 'other') {
+            otherRelativeInput.style.display = 'block';
+        } else {
+            otherRelativeInput.style.display = 'none';
+        }
+
+        // Optionally handle 'தாய்மாமன்' case
+        if (selectedValue === 'தாய்மாமன்') {
+            otherRelativeInput.style.display = 'block'; // Uncomment if you want it to show on 'தாய்மாமன்'
+        } else {
+            otherRelativeInput.style.display = 'none'; // Hide if not selected
+        }
+    }
+
 
     function printReceipt() {
         var id = document.getElementById('edit-id').value;
@@ -341,14 +384,18 @@ if ($total_amount === null) {
             '&profession1=' + encodeURIComponent(profession1) +
             '&relative_name=' + encodeURIComponent(relativeName) +
             '&place=' + encodeURIComponent(place) +
-            '&contactNumber=' + encodeURIComponent(contactNumber) +
+            '&contact_number=' + encodeURIComponent(contactNumber) +
             '&amount=' + encodeURIComponent(amount) +
             '&festival_id=' + encodeURIComponent(festivalId);
 
-        // Redirect to the constructed URL
-        window.location.href = url;
+        window.open(url, '_blank');
     }
 </script>
 
-
+<style>
+    .form-group label {
+    font-weight: normal;
+    
+}
+</style>
 <?php include('footer.php'); ?>

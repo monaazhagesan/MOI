@@ -27,6 +27,7 @@ $profession = isset($_GET['profession']) ? $_GET['profession'] : '';
 $spouse_name = isset($_GET['spouse_name']) ? $_GET['spouse_name'] : '';
 $profession1 = isset($_GET['profession1']) ? $_GET['profession1'] : '';
 $relative_name = isset($_GET['relative_name']) ? $_GET['relative_name'] : '';
+$other_relative = isset($_GET['other_relative']) ? $_GET['other_relative'] : '';
 $place = isset($_GET['place']) ? $_GET['place'] : '';
 $contactNumber = isset($_GET['contactNumber']) ? $_GET['contactNumber'] : '';
 $amount = isset($_GET['amount']) ? $_GET['amount'] : '';

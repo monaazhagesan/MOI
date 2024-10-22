@@ -1,11 +1,17 @@
 <?php
+error_reporting(E_ALL);
 include('header.php'); // Ensure header.php is properly included
 include "config.php";
-
+// var_dump($_SERVER);
+// exit;
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
+
+$query = "SELECT * FROM mrg WHERE festival_id = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("i", $festival_id);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve the user ID from the hidden input field
@@ -43,15 +49,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             );
 
             // Execute the statement
-            if ($stmt->execute()) {
-                // Redirect back to user list if the update was successful
-                header("Location: moidisplay.php?festival_id=" . $festival_id);
-                exit;
-            } else {
-                // Handle the error case
-                echo "Error updating record: " . $stmt->error;
+            try {
+                if ($stmt->execute()) {
+                    header("Location: moidisplay.php?festival_id=" . $festival_id);
+                    exit;
+                } else {
+                    throw new Exception("Error updating record: " . $stmt->error);
+                }
+            } catch (Exception $e) {
+                echo "Caught exception: " . $e->getMessage();
             }
-
+            
+            $conn->close();
             $stmt->close();
         } else {
             echo "Error preparing statement: " . $conn->error;

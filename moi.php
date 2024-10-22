@@ -1,18 +1,27 @@
 <?php
-include "config.php";
-include "header.php";
+include "config.php"; // Include your database connection
+include "header.php"; // Include your header
 error_reporting(E_ALL);
+
+if (session_status() == PHP_SESSION_NONE) {
+    session_start(); 
+}
+
+// Get the moi_id from the URL, if available
 $moi_id = isset($_GET['moi_id']) ? intval($_GET['moi_id']) : null;
 
 if (isset($_POST["submit"])) {
-    // Retrieve form inputs
-    $contactNumber = $_POST['contactNumber'];
-    $name = $_POST['name'];
-    $profession = $_POST['profession'];
-    $spouse_name = $_POST['spouse_name'];
-    $profession1 = $_POST['profession1'];
-    $relative_name = $_POST['relative_name'];
-    $place = $_POST['place'];
+    // Retrieve form inputs with default values
+    $contactNumber = $_POST['contactNumber'] ?? '';
+    $name = $_POST['name'] ?? '';
+    $profession = $_POST['profession'] ?? '';
+    $spouse_name = $_POST['spouse_name'] ?? '';
+    $profession1 = $_POST['profession1'] ?? '';
+    $relative_name = $_POST['relative_name'] ?? '';
+    $other_relative = $_POST['other_relative'] ?? ''; // Handle undefined index
+    $place = $_POST['place'] ?? '';
+
+    // Retrieve the amounts as integers, defaulting to 0
     $fivehundred = (int) ($_POST['fivehundred'] ?? 0);
     $twohundred = (int) ($_POST['twohundred'] ?? 0);
     $hundred = (int) ($_POST['hundred'] ?? 0);
@@ -26,53 +35,56 @@ if (isset($_POST["submit"])) {
     if (isset($_POST['festival_id']) && is_numeric($_POST['festival_id']) && $_POST['festival_id'] > 0) {
         $festival_id = (int) $_POST['festival_id'];
     } else {
-        // If the festival_id is missing or invalid, display an error and stop
         echo '<script>alert("Missing or invalid Festival ID."); window.location.href="moi.php";</script>';
         exit();
     }
 
-    $user_id = $_SESSION['id']; // Fetch the user ID from session
+    // Retrieve user_id from session
+    $user_id = $_SESSION['id'] ?? null;
 
-    // Check if at least one rupee denomination is entered
-    if ($fivehundred > 0 || $twohundred > 0 || $hundred > 0 || $fiftyrupees > 0 || $twentyrupees > 0 || $tenrupee > 0 || $onerupee > 0) {
-        // Prepare and bind SQL query
-        $query = $conn->prepare("INSERT INTO mrg(contactNumber, name, profession, spouse_name, profession1, relative_name, place, fivehundred, twohundred, hundred, fiftyrupees, twentyrupees, tenrupee, onerupee, amount, user_id, festival_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        $query->bind_param("ssssssssssssssiii", $contactNumber, $name, $profession, $spouse_name, $profession1, $relative_name, $place, $fivehundred, $twohundred, $hundred, $fiftyrupees, $twentyrupees, $tenrupee, $onerupee, $amount, $user_id, $festival_id);
+  // Check if at least one rupee denomination is entered
+  if ($fivehundred > 0 || $twohundred > 0 || $hundred > 0 || $fiftyrupees > 0 || $twentyrupees > 0 || $tenrupee > 0 || $onerupee > 0) {
+    $query = $conn->prepare("INSERT INTO mrg(contactNumber, name, profession, spouse_name, profession1, relative_name, place, fivehundred, twohundred, hundred, fiftyrupees, twentyrupees, tenrupee, onerupee, amount, user_id, festival_id , other_relative) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?)");
 
-        // Execute and handle result
-        try {
-            if ($query->execute()) {
-                $inserted_id = $conn->insert_id;
-                // Redirect to print_receipt.php with festival_id and moi_id
-                header("Location: print_receipt.php?festival_id=$festival_id&moi_id=$moi_id&id=$inserted_id");
-                exit();
-            } else {
-                // Show error message if insertion fails
-                $error_message = $query->error;
-                echo '<script>alert("Registration failed. Error: '.$error_message.'"); window.location.href="moi.php";</script>';
-            }
-        } catch (\Throwable $th) {
-            // Handle any unexpected errors
+    // Updated bind_param with correct number of 's' and 'i'
+    $query->bind_param("ssssssssssssssiiis", $contactNumber, $name, $profession, $spouse_name, $profession1, $relative_name, $place, $fivehundred, $twohundred, $hundred, $fiftyrupees, $twentyrupees, $tenrupee, $onerupee, $amount, $user_id, $festival_id , $other_relative);
+    
+    // Execute and handle result
+    try {
+        if ($query->execute()) {
+            $inserted_id = $conn->insert_id;
+            // Redirect to print_receipt.php with festival_id and moi_id
+            header("Location: print_receipt.php?festival_id=$festival_id&moi_id=$moi_id&id=$inserted_id");
+            exit();
+        } else {
+            // Show error message if insertion fails
             $error_message = $query->error;
             echo '<script>alert("Registration failed. Error: '.$error_message.'"); window.location.href="moi.php";</script>';
         }
-
-        // Close query and connection
-        $query->close();
-        $conn->close();
-    } else {
-        // Alert for at least one rupee denomination
-        echo '<script>alert("Please enter at least one rupee denomination!"); window.location.href="moi.php";</script>';
+    } catch (\Throwable $th) {
+        // Handle any unexpected errors
+        $error_message = $query->error;
+        echo '<script>alert("Registration failed. Error: '.$error_message.'"); window.location.href="moi.php";</script>';
     }
+
+    // Close query and connection
+    $query->close();
+    $conn->close();
+} else {
+    // Alert for at least one rupee denomination
+    echo '<script>alert("Please enter at least one rupee denomination!"); window.location.href="moi.php";</script>';
+}
 }
 
+
+
+// Fetch company details for display
 $admin_res = mysqli_query($conn, "SELECT * FROM company_details");
 $admin = mysqli_fetch_assoc($admin_res);
 $currentUsername = isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest';
-$festival_id = isset($_GET['moi_id']) ? intval($_GET['moi_id']) : 0; // Assuming festival_id is coming from moi_id
+$festival_id = isset($_GET['moi_id']) ? intval($_GET['moi_id']) : 0;
 
 // SQL Query to sum the total amount for the selected festival_id
-// SQL Query to sum the total amount and denominations for the selected festival_id
 $sql = "SELECT 
     (SUM(fivehundred) * 500) + 
     (SUM(twohundred) * 200) + 
@@ -99,7 +111,7 @@ $stmt->bind_result($total_amount, $total_fivehundred, $total_twohundred, $total_
 $stmt->fetch();
 $stmt->close();
 
-// If no records are found, default values should be set to 0
+// Set default values to 0 if no records found
 if ($total_amount === null) {
     $total_amount = 0;
     $total_fivehundred = 0;
@@ -110,9 +122,7 @@ if ($total_amount === null) {
     $total_tenrupee = 0;
     $total_onerupee = 0;
 }
-
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -180,111 +190,127 @@ if ($total_amount === null) {
             <div class="row">
                 <!-- Left Column -->
                 <div class="col-md-6">
-    <input type="hidden" name="festival_id" value="<?php echo $moi_id; ?>">
+                    <input type="hidden" name="festival_id" value="<?php echo $moi_id; ?>">
 
-    <div class="form-group">
-        <label for="contactNumber">தொடர்புஎண்</label>
-        <input type="text" class="form-control" id="contactNumber" name="contactNumber" onblur="checkMobileNumber()">
-    </div>
-    <div class="form-group">
-        <label for="name">பெயர்</label>
-        <input type="text" class="form-control" id="name" name="name" required>
-    </div>
-    <div class="form-group">
-        <label for="profession">தொழில்</label>
-        <input type="text" class="form-control" id="profession" name="profession" >
-    </div>
-    <div class="form-group">
-        <label for="spouse_name">துணைவி பெயர்</label>
-        <input type="text" class="form-control" id="spouse_name" name="spouse_name">
-    </div>
-    <div class="form-group">
-        <label for="profession1">தொழில்</label>
-        <input type="text" class="form-control" id="profession1" name="profession1" >
-    </div>
-    <div class="form-group">
-    <div class="form-group">
-    <label for="relative_name">உறவுமுறை பெயர்</label>
-    <div class="input-group">
-        <select class="form-control custom-select-with-icon" id="relative_name" name="relative_name" onchange="checkOtherOption()" >
-            <option value="" disabled selected>உறவுமுறை தேர்வு செய்க</option> <!-- Placeholder option -->
-            <option value="உறவுமுறை">உறவுமுறை</option>
-            <option value="தாய்மாமன்">தாய்மாமன்</option>
-            <option value="other">மற்றவை</option>
-        </select>
-    </div>
-</div>
+                    <div class="form-group">
+                        <label for="contactNumber">தொடர்புஎண்</label>
+                        <input type="text" class="form-control" id="contactNumber" name="contactNumber" onblur="checkMobileNumber()">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">பெயர்</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="profession">தொழில்</label>
+                        <input type="text" class="form-control" id="profession" name="profession">
+                    </div>
+                    <div class="form-group">
+                        <label for="spouse_name">துணைவி பெயர்</label>
+                        <input type="text" class="form-control" id="spouse_name" name="spouse_name">
+                    </div>
+                    <div class="form-group">
+                        <label for="profession1">தொழில்</label>
+                        <input type="text" class="form-control" id="profession1" name="profession1">
+                    </div>
+                    <div class="form-group">
+                        <div class="form-group">
+                            <label for="relative_name">உறவுமுறை பெயர்</label>
+                            <div class="input-group">
+                                <select class="form-control custom-select-with-icon" id="relative_name" name="relative_name" onchange="checkOtherOption()">
+                                    <option value="" disabled selected>உறவுமுறை தேர்வு செய்க</option> <!-- Placeholder option -->
+                                    <option value="உறவுமுறை">உறவுமுறை</option>
+                                    <option value="தாய்மாமன்">தாய்மாமன்</option>
+                                    <option value="other">மற்றவை</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" id="otherRelativeInput" style="display: none;">
+                            <label for="otherRelative">மேலும் தகவல்</label>
+                            <select class="form-control custom-select-with-icon" id="   " name="relative_name" onchange="checkOtherOption()">
+                                <option value="" disabled selected>உறவுமுறை தேர்வு செய்க</option>
+                                <option value="அப்பா (தாய்மாமன்)">அப்பா (தாய்மாமன்)</option>
+                                <option value="அம்மா (தாய்மாமன்)">அம்மா (தாய்மாமன்)</option>
+                                <option value="சகோதரர் (தாய்மாமன்)">சகோதரர் (தாய்மாமன்)</option>
+                                <option value="சகோதரி (தாய்மாமன்)">சகோதரி (தாய்மாமன்)</option>
+                                <option value="மாமா (தாய்மாமன்)">மாமா (தாய்மாமன்)</option>
+                                <option value="மாமி (தாய்மாமன்)">மாமி (தாய்மாமன்)</option>
+                                <option value="அண்ணன் (தாய்மாமன்)">அண்ணன் (தாய்மாமன்)</option>
+                                <option value="அக்கா (தாய்மாமன்)">அக்கா (தாய்மாமன்)</option>
+                                <option value="தங்கை (தாய்மாமன்)">தங்கை (தாய்மாமன்)</option>
+                                <option value="தம்பி (தாய்மாமன்)">தம்பி (தாய்மாமன்)</option>
+                                <option value="other">மற்றவை</option>
+                            </select>
+                        </div>
 
-<style>
-    /* Add custom icon to the select box */
-    .custom-select-with-icon {
-        appearance: none;
-        background: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16"><path d="M7.247 11.14l-4.796-5.481c-.566-.648-.106-1.659.796-1.659h9.608c.902 0 1.362 1.01.796 1.659l-4.796 5.481a1 1 0 0 1-1.408 0z"/></svg>') no-repeat right 10px center;
-        background-size: 16px 16px;
-        padding-right: 30px;
-    }
-</style>
+                        <style>
+                            /* Add custom icon to the select box */
+                            .custom-select-with-icon {
+                                appearance: none;
+                                background: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16"><path d="M7.247 11.14l-4.796-5.481c-.566-.648-.106-1.659.796-1.659h9.608c.902 0 1.362 1.01.796 1.659l-4.796 5.481a1 1 0 0 1-1.408 0z"/></svg>') no-repeat right 10px center;
+                                background-size: 16px 16px;
+                                padding-right: 30px;
+                            }
+                        </style>
 
-</div>
+                    </div>
 
-<style>
-    /* Add custom icon to the select box */
-    .custom-select-with-icon {
-        appearance: none;
-        background: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16"><path d="M7.247 11.14l-4.796-5.481c-.566-.648-.106-1.659.796-1.659h9.608c.902 0 1.362 1.01.796 1.659l-4.796 5.481a1 1 0 0 1-1.408 0z"/></svg>') no-repeat right 10px center;
-        background-size: 16px 16px;
-        padding-right: 30px;
-    }
-</style>
+                    <style>
+                        /* Add custom icon to the select box */
+                        .custom-select-with-icon {
+                            appearance: none;
+                            background: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-down-fill" viewBox="0 0 16 16"><path d="M7.247 11.14l-4.796-5.481c-.566-.648-.106-1.659.796-1.659h9.608c.902 0 1.362 1.01.796 1.659l-4.796 5.481a1 1 0 0 1-1.408 0z"/></svg>') no-repeat right 10px center;
+                            background-size: 16px 16px;
+                            padding-right: 30px;
+                        }
+                    </style>
 
-    <div class="form-group">
-        <label for="place">ஊர்</label>
-        <input type="text" class="form-control" id="place" name="place" required>
-    </div>
-   
-</div>
+                    <div class="form-group">
+                        <label for="place">ஊர்</label>
+                        <input type="text" class="form-control" id="place" name="place" required>
+                    </div>
+                </div>
 
                 <!-- Right Column -->
                 <div class="col-md-6">
-    <div class="form-group">
-        <label for="fivehundred">500 ரூபாய்:</label>
-        <input type="number" id="fivehundred" name="fivehundred" min="0" oninput="calculateTotal()">
-    </div>
-    <div class="form-group">
-        <label for="twohundred">200 ரூபாய்:</label>
-        <input type="number" id="twohundred" name="twohundred" min="0" oninput="calculateTotal()">
-    </div>
-    <div class="form-group">
-        <label for="hundred">100 ரூபாய்:</label>
-        <input type="number" id="hundred" name="hundred" min="0" oninput="calculateTotal()">
-    </div>
-    <div class="form-group">
-        <label for="fiftyrupees">50 ரூபாய்:</label>
-        <input type="number" id="fiftyrupees" name="fiftyrupees" min="0" oninput="calculateTotal()">
-    </div>
-    <div class="form-group">
-        <label for="twentyrupees">20 ரூபாய்:</label>
-        <input type="number" id="twentyrupees" name="twentyrupees" min="0" oninput="calculateTotal()">
-    </div>
-    <div class="form-group">
-        <label for="tenrupee">10 ரூபாய்:</label>
-        <input type="number" id="tenrupee" name="tenrupee" min="0" oninput="calculateTotal()">
-    </div>
-    <div class="form-group">
-        <label for="onerupee">1 ரூபாய்:</label>
-        <input type="number" id="onerupee" name="onerupee" min="0" oninput="calculateTotal()">
-    </div>
+                    <div class="form-group">
+                        <label for="fivehundred">500 ரூபாய்:</label>
+                        <input type="number" id="fivehundred" name="fivehundred" min="0" oninput="calculateTotal()">
+                    </div>
+                    <div class="form-group">
+                        <label for="twohundred">200 ரூபாய்:</label>
+                        <input type="number" id="twohundred" name="twohundred" min="0" oninput="calculateTotal()">
+                    </div>
+                    <div class="form-group">
+                        <label for="hundred">100 ரூபாய்:</label>
+                        <input type="number" id="hundred" name="hundred" min="0" oninput="calculateTotal()">
+                    </div>
+                    <div class="form-group">
+                        <label for="fiftyrupees">50 ரூபாய்:</label>
+                        <input type="number" id="fiftyrupees" name="fiftyrupees" min="0" oninput="calculateTotal()">
+                    </div>
+                    <div class="form-group">
+                        <label for="twentyrupees">20 ரூபாய்:</label>
+                        <input type="number" id="twentyrupees" name="twentyrupees" min="0" oninput="calculateTotal()">
+                    </div>
+                    <div class="form-group">
+                        <label for="tenrupee">10 ரூபாய்:</label>
+                        <input type="number" id="tenrupee" name="tenrupee" min="0" oninput="calculateTotal()">
+                    </div>
+                    <div class="form-group">
+                        <label for="onerupee">1 ரூபாய்:</label>
+                        <input type="number" id="onerupee" name="onerupee" min="0" oninput="calculateTotal()">
+                    </div>
 
-    <input type="hidden" id="amount" name="amount" value=""><br>
-    <div class="divider"></div>
-    <div class="form-group result">
-        மொத்த தொகை: <span id="total">0</span> ரூபாய்
-    </div>
-</div>
+                    <input type="hidden" id="amount" name="amount" value=""><br>
+                    <div class="divider"></div>
+                    <div class="form-group result">
+                        மொத்த தொகை: <span id="total">0</span> ரூபாய்
+                    </div>
+                </div>
                 <div class="form-group result text-right mt-3">
-    <!-- Table for Denominations Count -->
-    <!-- <strong>Denominations Count for Festival ID <?php echo $festival_id; ?>:</strong><br><br> -->
-    <!-- <table class="table table-bordered">
+                    <!-- Table for Denominations Count -->
+                    <!-- <strong>Denominations Count for Festival ID <?php echo $festival_id; ?>:</strong><br><br> -->
+                    <!-- <table class="table table-bordered">
         <thead>
             <tr>
                 <th>Denomination</th>
@@ -323,10 +349,10 @@ if ($total_amount === null) {
         </tbody>
     </table> -->
 
-    <!-- Total amount for the same festival_id -->
-    <strong>நிகழ்வின் மொத்த தொகை:</strong> <span id="festival_total"><?php echo $total_amount; ?></span> ரூபாய்
-</div>
-<div class="d-flex">
+                    <!-- Total amount for the same festival_id -->
+                    <strong>நிகழ்வின் மொத்த தொகை:</strong> <span id="festival_total"><?php echo $total_amount; ?></span> ரூபாய்
+                </div>
+                <div class="d-flex">
                     <button type="submit" name="submit" class="btn btn-primary btn-block"
                         style="width: 25%;">சமர்ப்பிக்கவும்</button> &emsp;&emsp;
                     <!-- <button type="button" class="btn btn-secondary print-button" onclick="printForm()"
@@ -334,7 +360,6 @@ if ($total_amount === null) {
                 </div>
 
             </div>
-
 
         </form>
     </div>
@@ -355,10 +380,30 @@ if ($total_amount === null) {
             document.getElementById('total').innerText = total;
             document.getElementById('amount').value = total;
 
-             // Get the existing total amount for the same festival from the backend
+            // Get the existing total amount for the same festival from the backend
             var festivalTotal = parseInt(document.getElementById('festival_total').innerText) || 0;
             var newFestivalTotal = festivalTotal + total;
             document.getElementById('festival_total').innerText = newFestivalTotal;
+        }
+
+        function checkOtherOption() {
+            const relativeNameSelect = document.getElementById('relative_name');
+            const otherRelativeInput = document.getElementById('otherRelativeInput');
+            const selectedValue = relativeNameSelect.value;
+
+            // Show the additional input field based on selection
+            if (selectedValue === 'other') {
+                otherRelativeInput.style.display = 'block';
+            } else {
+                otherRelativeInput.style.display = 'none';
+            }
+
+            // Optionally handle 'தாய்மாமன்' case
+            if (selectedValue === 'தாய்மாமன்') {
+                otherRelativeInput.style.display = 'block'; // Uncomment if you want it to show on 'தாய்மாமன்'
+            } else {
+                otherRelativeInput.style.display = 'none'; // Hide if not selected
+            }
         }
 
         // function checkOtherOption() {
@@ -380,7 +425,7 @@ if ($total_amount === null) {
                 xhr.open("POST", "check_mobile_number.php", true);
                 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-                xhr.onreadystatechange = function () {
+                xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         const response = JSON.parse(xhr.responseText);
                         if (response.exists) {
@@ -388,6 +433,7 @@ if ($total_amount === null) {
                             document.getElementById('profession').value = response.profession;
                             document.getElementById('spouse_name').value = response.spouse_name;
                             document.getElementById('profession1').value = response.profession1;
+                            document.getElementById('relative_name').value = response.relative_name;
                             document.getElementById('relative_name').value = response.relative_name;
                             document.getElementById('place').value = response.place;
                         } else {
@@ -406,9 +452,12 @@ if ($total_amount === null) {
             }
         }
 
-        // var adminContactNumber = '<?php //echo $admin['contact_number']; ?>';
-        // var adminCompanyName = '<?php //echo $admin['company_nsame']; ?>';
-        // var currentUsername = '<?php //echo $currentUsername; ?>';
+        // var adminContactNumber = '<?php //echo $admin['contact_number']; 
+                                        ?>';
+        // var adminCompanyName = '<?php //echo $admin['company_nsame']; 
+                                    ?>';
+        // var currentUsername = '<?php //echo $currentUsername; 
+                                    ?>';
         // function printForm() {
         //     // Create a new window for printing
         //     const printWindow = window.open('', '', 'width=570');
@@ -417,8 +466,10 @@ if ($total_amount === null) {
         //     const form = document.querySelector('form'); // Change selector if needed
 
         //     // Admin details
-        //     const adminContactNumber = '<?php //echo $admin['contact_number']; ?>';
-        //     const adminCompanyName = '<?php //echo $admin['company_name']; ?>';
+        //     const adminContactNumber = '<?php //echo $admin['contact_number']; 
+                                            ?>';
+        //     const adminCompanyName = '<?php //echo $admin['company_name']; 
+                                            ?>';
 
         //     // Get the current date and time
         //     const now = new Date();
@@ -453,10 +504,7 @@ if ($total_amount === null) {
         //     printWindow.document.close(); // Necessary for IE >= 10
         //     printWindow.print();
         // }
-
-
     </script>
 </body>
 
 </html>
-

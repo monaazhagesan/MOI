@@ -27,7 +27,6 @@ if (mysqli_num_rows($res) > 0) {
         $allRows[] = $row; // Collect rows in an array
     }
 } else {
-    // If no data is available, handle accordingly
     $html = '<p>No data available</p>';
     $mpdf->WriteHTML($html);
     $pdfFilePath = 'pdfs/festival_details_' . $festival_id . '.pdf';
@@ -36,17 +35,34 @@ if (mysqli_num_rows($res) > 0) {
     exit;
 }
 
-// Now you can process the data in $allRows
-$taiMamanRows = array_filter($allRows, function ($row) {
-    return $row['relative_name'] === 'தாய்மாமன்';
+$thaaimamanRelations = [
+    'அப்பா (தாய்மாமன்)',
+    'அம்மா (தாய்மாமன்)',
+    'சகோதரர் (தாய்மாமன்)',
+    'சகோதரி (தாய்மாமன்)',
+    'அண்ணன் (தாய்மாமன்)',
+    'அக்கா (தாய்மாமன்)',
+    'தங்கை (தாய்மாமன்)',
+    'தம்பி (தாய்மாமன்)',
+    'மாமா (தாய்மாமன்)',
+    'மாமி (தாய்மாமன்)',
+    'மற்றவை'
+];
+
+// Filter the data based on 'தாய்மாமன்' relationships
+$taiMamanRows = array_filter($allRows, function ($row) use ($thaaimamanRelations) {
+    return in_array($row['relative_name'], $thaaimamanRelations);
 });
+
+$otherRows = array_filter($allRows, function ($row) use ($thaaimamanRelations) {
+    return !in_array($row['relative_name'], $thaaimamanRelations);
+});
+
+// Group data for display
 $groupedData1 = [];
 foreach ($taiMamanRows as $row) {
-    $groupedData1['தாய்மாமன்'][] = $row;
+    $groupedData1[$row['relative_name']][] = $row;
 }
-$otherRows = array_filter($allRows, function ($row) {
-    return $row['relative_name'] !== 'தாய்மாமன்';
-});
 foreach ($otherRows as $row) {
     $place = $row['place'];
     if (!isset($groupedData2[$place]) && !isset($groupedData2[trim($place)])) {
@@ -150,62 +166,61 @@ $grandTotal = 0;
 $recordsPerPage = 10; // Set the number of records per page to 20
 $recordCount = 0;
 
-// Display 'தாய்மாமன்' section
-$res_thaimaman = array_filter($allRows, function ($row) {
-    return $row['relative_name'] === 'தாய்மாமன்';
-});
+// // Group data for display
+// $groupedData = [];
+// foreach ($taiMamanRows as $row) {
+//     $groupedData[$row['relative_name']][] = $row;
+// }
 
-if (!empty($res_thaimaman)) {
-    // Display the title for 'தாய்மாமன்' section
+// Group data for display
+$groupedData1 = [];
+foreach ($taiMamanRows as $row) {
+    $groupedData1[$row['relative_name']][] = $row;
+}
+
+foreach ($otherRows as $row) {
+    $place = $row['place'];
+    if (!isset($groupedData2[$place]) && !isset($groupedData2[trim($place)])) {
+        $groupedData2[$place] = [];
+    }
+    $groupedData2[$place][] = $row;
+}
+foreach ($groupedData as $relation => $rows) {
+    // Display the title for each relationship
     $html .= '<tr>
-                <td colspan="6" style="padding: 5px;text-align:center;font-size:20px;font-family: latha;"><strong>தாய்மாமன்</strong></td>
+                <td colspan="5" style="padding: 5px;text-align:center;font-size:20px;font-family: latha;"><strong>' . $relation . '</strong></td>
               </tr>';
 
-    foreach ($res_thaimaman as $row) {
-        if ($recordCount == $recordsPerPage) {
-            $html .= '<tr>
-                        <td colspan="3" style="text-align:right;padding: 10px;font-family: latha;"><strong>Page Total</strong></td>
-                        <td style="text-align:right;padding: 10px;"><strong>' . number_format($pageTotal, 0) . '</strong></td>
-                        <td colspan="2"></td>
-                      </tr></tbody></table>';
+    foreach ($rows as $row) {
+        $html .= '<tr>
+        <td style="text-align:center; font-size:14px;padding: 10px;font-family: latha;">' . $counter++ . '</td>
+        <td style="font-size:14px;padding: 10px;font-family: latha;">';
 
-            $mpdf->WriteHTML($html);
-            $mpdf->SetFooter('{PAGENO} / {nbpg}');
-            $mpdf->AddPage();
-
-            // Reset the page total and record count for the new page
-            $pageTotal = 0;
-            $recordCount = 0;
-
-            $html = '<table border="1" style="border-collapse:collapse; width:100%; font-size:12px;">';
-            $html .= '<thead><tr>
-                        <th style="padding: 5px;font-size:16px;font-family: latha;">வ.எண்</th>
-                        <th style="padding: 5px;font-size:16px;font-family: latha;">உறவினர் விவரம்</th>                
-                        <th style="padding: 5px;font-size:16px;font-family: latha;">பெற்ற மொய்</th>
-                        <th style="padding: 5px;font-size:16px;font-family: latha;">செய்த மொய்</th>
-                        <th style="padding: 5px;font-size:16px;font-family: latha;">மொத்தம் பெற்ற இருப்பு</th>
-                      </tr></thead><tbody>';
+        // Check if both name and spouse_name are available
+        if (!empty($row['name']) && !empty($row['spouse_name'])) {
+            // Print name, profession if available, and spouse name with a hyphen in between
+            $html .= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') .
+                     (!empty($row['profession1']) ? ' (' . htmlspecialchars($row['profession1'], ENT_QUOTES, 'UTF-8') . ')' : '') .
+                     ' - ' . htmlspecialchars($row['spouse_name'], ENT_QUOTES, 'UTF-8');
+        } elseif (!empty($row['name']) && empty($row['spouse_name'])) {
+            // Print only name and profession if spouse name is missing
+            $html .= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') .
+                     (!empty($row['profession1']) ? ' (' . htmlspecialchars($row['profession1'], ENT_QUOTES, 'UTF-8') . ')' : '');
         }
 
-        // Add row data for 'தாய்மாமன்'
-        $html .= '<tr>
-                    <td style="text-align:center; font-size:14px;padding: 10px;font-family: latha;">' . $counter++ . '</td>
-                    <td style="font-size:14px;padding: 10px;font-family: latha;">
-                        ' . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') .
-            (!empty($row['profession1']) ? ' (' . htmlspecialchars($row['profession1'], ENT_QUOTES, 'UTF-8') . ')' : '') .
-            ' - ' . htmlspecialchars($row['spouse_name'], ENT_QUOTES, 'UTF-8') . '
-                    </td>
-                    <td style="text-align:right; padding: 10px;font-family: latha;font-size: 30px; font-weight: bold;">' . number_format($row['amount'], 0) . '</td>
-                    <td style="font-size:14px;padding: 10px;font-family: latha;"></td>
-                    <td style="text-align:right; padding: 10px;font-family: latha;"></td>
-                  </tr>';
+$html .= '</td>
+        <td style="text-align:right; padding: 10px;font-family: latha;font-size: 20px; font-weight: bold;">' . number_format($row['amount'], 0) . '</td>
+        <td style="font-size:14px;padding: 10px;font-family: latha;"></td>
+        <td style="text-align:right; padding: 10px;font-family: latha;"></td>
+      </tr>';
+      
+        $grandTotal += $row['amount'];
+    }
+}                 
         $pageTotal += $row['amount'];
         $grandTotal += $row['amount'];
         $recordCount++;
-    }
-}
 
-// Now display the rest of the entries grouped by place
 $res_others = array_filter($allRows, function ($row) {
     return $row['relative_name'] !== 'தாய்மாமன்';
 });
@@ -215,7 +230,7 @@ foreach ($res_others as $row) {
 
         $html .= '<tr>
         <td colspan="2" style="text-align:right;padding: 10px;font-family: latha;font-size:16px;"><strong>பக்கத்தின் மொத்தம்</strong></td>
-        <td style="text-align:right;padding: 10px; font-size:25px;"><strong>' . number_format($pageTotal, 0) . '</strong></td>
+        <td style="text-align:right;padding: 10px; font-size:20px;"><strong>' . number_format($pageTotal, 0) . '</strong></td>
         <td colspan="2"></td>
     </tr></tbody></table>';
 
@@ -224,7 +239,6 @@ foreach ($res_others as $row) {
         $mpdf->SetFooter('{PAGENO} / {nbpg}');
         $mpdf->AddPage();
 
-        // Reset the page total and record count for the new page
         $pageTotal = 0;
         $recordCount = 0;
 
@@ -237,44 +251,51 @@ foreach ($res_others as $row) {
                     <th style="padding: 5px;font-size:16px;font-family: latha;">மொத்தம் பெற்ற இருப்பு</th>
                   </tr></thead><tbody>';
     }
+    if (!empty($row['name']) && !empty($row['spouse_name'])) {
+      $html .= '<tr>
+            <td style="text-align:center; font-size:14px;padding: 10px;font-family: latha;">' . $counter++ . '</td>
+            <td style="font-size:14px;padding: 10px;font-family: latha;">';
 
-    if (!isset($lastPrintedPlace) || $lastPrintedPlace !== trim($row['place'])) {
-        $html .= '<tr>
-            <td colspan="6" style="padding: 5px;text-align:center;font-size:20px;font-family: latha;"><strong>' . $row['place'] . '</strong></td>
-        </tr>';
+            // Check if both name and spouse_name are available
+            if (!empty($row['name']) && !empty($row['spouse_name'])) {
+                // Print name, profession if available, and spouse name with a hyphen in between
+                $html .= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') .
+                         (!empty($row['profession1']) ? ' (' . htmlspecialchars($row['profession1'], ENT_QUOTES, 'UTF-8') . ')' : '') .
+                         ' - ' . htmlspecialchars($row['spouse_name'], ENT_QUOTES, 'UTF-8');
+            } elseif (!empty($row['name']) && empty($row['spouse_name'])) {
+                // Print only name and profession if spouse name is missing
+                $html .= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') .
+                         (!empty($row['profession1']) ? ' (' . htmlspecialchars($row['profession1'], ENT_QUOTES, 'UTF-8') . ')' : '');
+            }
+
+$html .= '</td>
+            <td style="text-align:right; padding: 10px;font-family: latha;font-size: 20px; font-weight: bold;">' . number_format($row['amount'], 0) . '</td>
+            <td style="font-size:14px;padding: 10px;font-family: latha;"></td>
+            <td style="text-align:right; padding: 10px;font-family: latha;"></td>
+          </tr>';
+
+        // Update last printed place
+        $lastPrintedPlace = trim($row['place']);
+        
+        // Update totals
+        $pageTotal += $row['amount'];
+        $grandTotal += $row['amount'];
+        $recordCount++;
     }
-
-    // Add row data for other relatives
-    $html .= '<tr>
-                <td style="text-align:center; font-size:14px;padding: 10px;font-family: latha;">' . $counter++ . '</td>
-                <td style="font-size:14px;padding: 10px;font-family: latha;">
-                    ' . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') .
-        (!empty($row['profession1']) ? ' (' . htmlspecialchars($row['profession1'], ENT_QUOTES, 'UTF-8') . ')' : '') .
-        ' - ' . htmlspecialchars($row['spouse_name'], ENT_QUOTES, 'UTF-8') . '
-                </td>
-                <td style="text-align:right; padding: 10px;font-family: latha;font-size: 30px; font-weight: bold;">' . number_format($row['amount'], 0) . '</td>
-                <td style="font-size:14px;padding: 10px;font-family: latha;"></td>
-                <td style="text-align:right; padding: 10px;font-family: latha;"></td>
-              </tr>';
-
-    $lastPrintedPlace = trim($row['place']);
-    $pageTotal += $row['amount'];
-    $grandTotal += $row['amount'];
-    $recordCount++;
 }
 
 
  // Add the last page's total amount
  $html .= '<tr>
  <td colspan="2" style="text-align:right;padding: 10px;font-family: latha;font-size:16px;"><strong>பக்கத்தின் மொத்தம்</strong></td>
- <td style="text-align:right;padding: 10px;font-size:25px;"><strong>' . number_format($pageTotal, 0) . '</strong></td>
+ <td style="text-align:right;padding: 10px;font-size:18px;"><strong>' . number_format($pageTotal, 0) . '</strong></td>
  <td colspan="2"></td>
 </tr>';
 
 // Add grand total at the end
 $html .= '<tr>
  <td colspan="2" style="text-align:right;padding: 10px;font-family: latha;font-size:16px;"><strong>மொத்த தொகை</strong></td>
- <td style="text-align:right;padding: 10px;font-size:25px;"><strong>' . number_format($grandTotal, 0) . '</strong></td>
+ <td style="text-align:right;padding: 10px;font-size:18px;"><strong>' . number_format($grandTotal, 0) . '</strong></td>
  <td colspan="2"></td>
 </tr></tbody></table>';
 
