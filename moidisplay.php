@@ -237,6 +237,7 @@ if ($total_amount === null) {
                     <input type="hidden" name="id" id="edit-id">
                     <input type="hidden" name="user_id" id="edit-uid">
                     <input type="hidden" name="festival_id" id="edit-festival-id" value="<?php echo $festival_id; ?>">
+                    <input type="hidden" name="language" value="tamil"/>
                     <div class="col-12">
                         <div class="row">
                             <div class="col-6">
@@ -389,6 +390,52 @@ if ($total_amount === null) {
         window.open(url, '_blank');
     }
 </script>
+<SCRIPT language=JavaScript src="assets/js/utf.js"></SCRIPT>
+    <SCRIPT language=JavaScript src="assets/js/tamil.js"></SCRIPT>
+    <script type="text/javascript" src="assets/js/jquery.js"></script>
+    <script>
+        $(document).on('keypress', '.convertLang', function(event) {
+            if ($('input[name="language"]').val() == 'tamil') {
+                convertThis(event);
+            }
+        });
+        // on click shortcut (ctrl+l) change language
+        // Listen for the keydown event to detect Ctrl+L
+        $(document).on('keydown', function(event) {
+            console.log(event.key);
+            if (event.ctrlKey && event.key === 'l') {
+                event.preventDefault(); // Prevent default browser action for Ctrl+L
+                //change language radio
+                if ($('input[name="language"]').val() == 'tamil') {
+                    $('input[name="language"]').val('english');
+                } else {
+                    $('input[name="language"]').val('tamil');
+                }
+            }
+        });
+        // if control s is pressed trigger save button
+        $(document).on('keydown', function(event) {
+            if (event.ctrlKey && event.key === 's') {
+                event.preventDefault(); // Prevent default browser action for Ctrl+S
+                //trigger save button
+                $('#update').trigger('click');
+            }
+        });
+
+        // if control p is pressed trigger print button
+        $(document).on('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'p') {
+                event.preventDefault(); // Prevent default browser action for Ctrl+P
+                //trigger print button
+                $('#print').trigger('click');
+            }
+        });
+    </script>
+    <style>
+        /* #HelpDiv {
+            display: none !important;
+        } */
+    </style>
 
 
 <?php include('footer.php'); ?>

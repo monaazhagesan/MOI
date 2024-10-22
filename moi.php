@@ -43,35 +43,36 @@ if (isset($_POST["submit"])) {
     // Retrieve user_id from session
     $user_id = $_SESSION['id'] ?? null;
 
-  // Check if at least one rupee denomination is entered
-  if ($fivehundred > 0 || $twohundred > 0 || $hundred > 0 || $fiftyrupees > 0 || $twentyrupees > 0 || $tenrupee > 0 || $onerupee > 0) {
-    $query = $conn->prepare("INSERT INTO mrg(contactNumber, name, profession, spouse_name, profession1, relative_name, place, fivehundred, twohundred, hundred, fiftyrupees, twentyrupees, tenrupee, onerupee, amount, user_id, festival_id , other_relative) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?)");
-
-    // Updated bind_param with correct number of 's' and 'i'
-    $query->bind_param("ssssssssssssssiiis", $contactNumber, $name, $profession, $spouse_name, $profession1, $relative_name, $place, $fivehundred, $twohundred, $hundred, $fiftyrupees, $twentyrupees, $tenrupee, $onerupee, $amount, $user_id, $festival_id , $other_relative);
-    
-    // Execute and handle result
-    try {
-        if ($query->execute()) {
-            $inserted_id = $conn->insert_id;
-            // Redirect to print_receipt.php with festival_id and moi_id
-            header("Location: print_receipt.php?festival_id=$festival_id&moi_id=$moi_id&id=$inserted_id");
-            exit();
-        } else {
-            // Show error message if insertion fails
+    // Check if at least one rupee denomination is entered
+    if ($fivehundred > 0 || $twohundred > 0 || $hundred > 0 || $fiftyrupees > 0 || $twentyrupees > 0 || $tenrupee > 0 || $onerupee > 0) {
+        $query = $conn->prepare("INSERT INTO mrg(contactNumber, name, profession, spouse_name, profession1, relative_name, place, fivehundred, twohundred, hundred, fiftyrupees, twentyrupees, tenrupee, onerupee, amount, user_id, festival_id , other_relative) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? ,?)");
+        
+        // Updated bind_param with correct number of 's' and 'i'
+        $query->bind_param("ssssssssssssssiiis", $contactNumber, $name, $profession, $spouse_name, $profession1, $relative_name, $place, $fivehundred, $twohundred, $hundred, $fiftyrupees, $twentyrupees, $tenrupee, $onerupee, $amount, $user_id, $festival_id , $other_relative);
+        // Execute and handle result
+        try {
+            if ($query->execute()) {
+                $inserted_id = $conn->insert_id;
+                // Redirect to print_receipt.php with festival_id and moi_id
+                header("Location: print_receipt.php?festival_id=$festival_id&moi_id=$moi_id&id=$inserted_id");
+                exit();
+            } else {
+                // var_dump($_COOKIE);
+                // exit;
+                // Show error message if insertion fails
+                $error_message = $query->error;
+                echo '<script>alert("Registration failed. Error: '.$error_message.'"); window.location.href="moi.php";</script>';
+            }
+        } catch (\Throwable $th) {
+            // Handle any unexpected errors
             $error_message = $query->error;
             echo '<script>alert("Registration failed. Error: '.$error_message.'"); window.location.href="moi.php";</script>';
         }
-    } catch (\Throwable $th) {
-        // Handle any unexpected errors
-        $error_message = $query->error;
-        echo '<script>alert("Registration failed. Error: '.$error_message.'"); window.location.href="moi.php";</script>';
-    }
-
-    // Close query and connection
-    $query->close();
-    $conn->close();
-} else {
+        
+        // Close query and connection
+        $query->close();
+        $conn->close();
+    } else {
     // Alert for at least one rupee denomination
     echo '<script>alert("Please enter at least one rupee denomination!"); window.location.href="moi.php";</script>';
 }
@@ -184,6 +185,17 @@ if ($total_amount === null) {
 
 <body>
     <div class="container-moi">
+    <div class="float-right">
+            <!--language selector-->
+            <div class="btn-group">
+                <label class="btn btn-primary">
+                    <input type="radio" name="language" value="tamil" checked> தமிழ்
+                </label>
+                <label class="btn btn-primary">
+                    <input type="radio" name="language" value="english"> English
+                </label>
+            </div>
+        </div>
         <h2 class="text-center">தகவலுக்கு விண்ணப்பம்</h2>
         <form action="#" method="POST">
             <div class="row">
@@ -504,6 +516,104 @@ if ($total_amount === null) {
         //     printWindow.print();
         // }
     </script>
+      <SCRIPT language=JavaScript src="assets/js/utf.js"></SCRIPT>
+    <SCRIPT language=JavaScript src="assets/js/tamil.js"></SCRIPT>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script>
+        $(document).on('keypress', '.convertLang', function(event) {
+            if ($('input[name="language"]:checked').val() == 'tamil') {
+                convertThis(event);
+            }
+        });
+        // on click shortcut (ctrl+l) change language
+        // Listen for the keydown event to detect Ctrl+L
+        $(document).on('keydown', function(event) {
+            console.log(event.key);
+            if (event.ctrlKey && event.key === 'l') {
+                event.preventDefault(); // Prevent default browser action for Ctrl+L
+                //change language radio
+                if ($('input[name="language"]:checked').val() == 'tamil') {
+                    $('input[name="language"][value="english"]').prop('checked', true);
+                } else {
+                    $('input[name="language"][value="tamil"]').prop('checked', true);
+                }
+            }
+        });
+        // if control s is pressed trigger save button
+        $(document).on('keydown', function(event) {
+            if (event.ctrlKey && event.key === 's') {
+                event.preventDefault(); // Prevent default browser action for Ctrl+S
+                //trigger save button
+                $('button[type="submit"]').trigger('click');
+            }
+        });
+
+        // if control p is pressed trigger print button
+        $(document).on('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'p') {
+                event.preventDefault(); // Prevent default browser action for Ctrl+P
+                $('input[name="print"]').val('1');
+                $('button[type="submit"]').trigger('click');
+            }
+        });
+    </script>
+    <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
+    <script>
+        // $("#contactNumber").autocomplete({
+        //     source: function(request, response) {
+        //         $.ajax({
+        //             url: "contactNumbers.php?fest_id=<?php echo $festival_id; ?>",
+        //             dataType: "jsonp",
+        //             data: {
+        //                 term: request.term
+        //             },
+        //             success: function(data) {
+        //                 response(data);
+        //             }
+        //         });
+        //     },
+        //     minLength: 2,
+        //     select: function(event, ui) {}
+        // });
+
+        $("#contactNumber")
+            // don't navigate away from the field on tab when selecting an item
+            .on("keydown", function(event) {
+                if (event.keyCode === $.ui.keyCode.TAB &&
+                    $(this).autocomplete("instance").menu.active) {
+                    event.preventDefault();
+                }
+            })
+            .autocomplete({
+                source: function(request, response) {
+                    $.getJSON("contactNumbers.php", {
+                        term: request.term
+                    }, response);
+                },
+                focus: function() {
+                    // prevent value inserted on focus
+                    return false;
+                },
+                select: function(event, ui) {
+                    $('#name').val(ui.item.name);
+                    $('#spouse_name').val(ui.item.spouse_name);
+                    $('#relative_name').val(ui.item.relative_name);
+                    $('#place').val(ui.item.place);
+                    $('#profession').val(ui.item.profession);
+                    $('#profession1').val(ui.item.profession1);
+                    $('#contactNumber').val(ui.item.contactNumber);
+                    return false;
+                }
+            });
+    </script>
+    <style>
+        /* #HelpDiv {
+            display: none !important;
+        } */
+    </style>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
+
+
 </body>
 
 </html>
