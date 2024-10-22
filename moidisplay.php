@@ -237,9 +237,54 @@ if ($total_amount === null) {
                     <input type="hidden" name="id" id="edit-id">
                     <input type="hidden" name="user_id" id="edit-uid">
                     <input type="hidden" name="festival_id" id="edit-festival-id" value="<?php echo $festival_id; ?>">
-                    <input type="hidden" name="language" value="tamil"/>
+                    <input type="hidden" name="language" value="tamil" />
                     <div class="col-12">
                         <div class="row">
+
+                        <div class="col-md-6">
+                    <input type="hidden" name="festival_id" value="2">
+                    <input type="hidden" name="print" value="0">
+                    <div class="form-group">
+                        <label for="place">ஊர்</label>
+                        <div id="HelpDiv" align="left" style="display: none;"><table cellpadding="2" cellspacing="0" border="0" style="border:1px solid #0DE8E9;background-color:#BDE8E9"><tbody><tr><td style="font-size:12px;border:1px solid #0DE8E9;">ச் + a = <b>ச‌</b></td><td style="font-size:12px;border:1px solid #0DE8E9;">ச் + A = <b>சா</b></td><td style="font-size:12px;border:1px solid #0DE8E9;">ச் + i = <b>சி</b></td><td style="font-size:12px;border:1px solid #0DE8E9;">ச் + I = <b>சீ</b></td><td style="font-size:12px;border:1px solid #0DE8E9;">ச் + u = <b>சு</b></td><td style="font-size:12px;border:1px solid #0DE8E9;">ச் + U = <b>சூ</b></td><td style="font-size:12px;border:1px solid #0DE8E9;">ச் + e = <b>செ</b></td><td style="font-size:12px;border:1px solid #0DE8E9;">ச் + E = <b>சே</b></td><td style="font-size:12px;border:1px solid #0DE8E9;">ச் + a + i = <b>சை</b></td><td style="font-size:12px;border:1px solid #0DE8E9;">ச் + o = <b>சொ</b></td><td style="font-size:12px;border:1px solid #0DE8E9;">ச் + o = <b>சோ</b></td><td style="font-size:12px;border:1px solid #0DE8E9;">ச் + a + u = <b>சௌ</b></td><td style="font-size:12px;border:1px solid #0DE8E9;">ச் + h = <b>ஷ்</b></td></tr></tbody></table></div><input type="text" class="form-control convertLang" id="place" name="place" required="">
+                    </div>
+                    <div class="form-group">
+                        <label for="contactNumber">தொடர்புஎண்</label>
+                        <input type="text" class="form-control ui-autocomplete-input ui-autocomplete-loading" id="contactNumber" name="contactNumber" onchange="checkMobileNumber()" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">பெயர்</label>
+                        <input type="text" class="form-control convertLang" id="name" name="name" required="">
+                    </div>
+                    <div class="form-group">
+                        <label for="profession">தொழில்</label>
+                        <input type="text" class="form-control convertLang" id="profession" name="profession">
+                    </div>
+                    <div class="form-group">
+                        <label for="spouse_name">துணைவி பெயர்</label>
+                        <input type="text" class="form-control convertLang" id="spouse_name" name="spouse_name">
+                    </div>
+                    <div class="form-group">
+                        <label for="profession1">தொழில்</label>
+                        <input type="text" class="form-control convertLang" id="profession1" name="profession1">
+                    </div>
+                    <div class="form-group">
+                        <label for="relative_name">உறவுமுறை பெயர்</label>
+                        <select class="form-control" id="relative_name" name="relative_name" onchange="checkOtherOption()">
+                            <option value="உறவுமுறை">உறவுமுறை</option>
+                            <option value="தாய்மாமன்">தாய்மாமன்</option>
+                            <!-- Add more options as needed -->
+                            <!-- <option value="other">மற்றவை</option> -->
+                        </select>
+                    </div>
+                    <!-- <div class="form-group" id="other_relative_name_div" style="display: none;">
+                        <label for="other_relative_name">மற்றவை (உங்கள் உறவுமுறை பெயரை உள்ளிடுக)</label>
+                        <input type="text" class="form-control" id="other_relative_name" name="other_relative_name"
+                            placeholder="உங்கள் உறவுமுறை பெயரை உள்ளிடுக">
+                    </div> -->
+
+
+                </div>
                             <div class="col-6">
                                 <div class="mb-3">
                                     <label for="edit-name" class="form-label">பெயர் <span class="text-danger">*</span></label>
@@ -258,7 +303,7 @@ if ($total_amount === null) {
                                     <input type="text" class="form-control" id="edit-profession1" name="profession1">
                                 </div>
                             </div>
-                            <div class="col-6">  
+                            <div class="col-6">
                                 <div class="form-group">
                                     <label for="edit-relative-name" style="font-weight: normal;">உறவுமுறை பெயர்</label>
                                     <div class="input-group">
@@ -270,7 +315,7 @@ if ($total_amount === null) {
                                         </select>
                                     </div><br>
                                     <div class="form-group" id="otherRelativeInput" style="display: none; font-weight: normal;">
-                                        <label for="otherRelative" style="font-weight: normal;" >மேலும் தகவல்</label>
+                                        <label for="otherRelative" style="font-weight: normal;">மேலும் தகவல்</label>
                                         <select class="form-control custom-select-with-icon" id="" name="relative_name" onchange="checkOtherOption()">
                                             <option value="" disabled selected>உறவுமுறை தேர்வு செய்க</option>
                                             <option value="அப்பா (தாய்மாமன்)">அப்பா (தாய்மாமன்)</option>
@@ -391,51 +436,75 @@ if ($total_amount === null) {
     }
 </script>
 <SCRIPT language=JavaScript src="assets/js/utf.js"></SCRIPT>
-    <SCRIPT language=JavaScript src="assets/js/tamil.js"></SCRIPT>
-    <script type="text/javascript" src="assets/js/jquery.js"></script>
-    <script>
-        $(document).on('keypress', '.convertLang', function(event) {
+<SCRIPT language=JavaScript src="assets/js/tamil.js"></SCRIPT>
+<script type="text/javascript" src="assets/js/jquery.js"></script>
+<script>
+    $(document).on('keypress', '.convertLang', function(event) {
+        if ($('input[name="language"]').val() == 'tamil') {
+            convertThis(event);
+        }
+    });
+    // on click shortcut (ctrl+l) change language
+    // Listen for the keydown event to detect Ctrl+L
+    $(document).on('keydown', function(event) {
+        console.log(event.key);
+        if (event.ctrlKey && event.key === 'l') {
+            event.preventDefault(); // Prevent default browser action for Ctrl+L
+            //change language radio
             if ($('input[name="language"]').val() == 'tamil') {
-                convertThis(event);
+                $('input[name="language"]').val('english');
+            } else {
+                $('input[name="language"]').val('tamil');
             }
-        });
-        // on click shortcut (ctrl+l) change language
-        // Listen for the keydown event to detect Ctrl+L
-        $(document).on('keydown', function(event) {
-            console.log(event.key);
-            if (event.ctrlKey && event.key === 'l') {
-                event.preventDefault(); // Prevent default browser action for Ctrl+L
-                //change language radio
-                if ($('input[name="language"]').val() == 'tamil') {
-                    $('input[name="language"]').val('english');
-                } else {
-                    $('input[name="language"]').val('tamil');
-                }
-            }
-        });
-        // if control s is pressed trigger save button
-        $(document).on('keydown', function(event) {
-            if (event.ctrlKey && event.key === 's') {
-                event.preventDefault(); // Prevent default browser action for Ctrl+S
-                //trigger save button
-                $('#update').trigger('click');
-            }
-        });
+        }
+    });
+    // if control s is pressed trigger save button
+    $(document).on('keydown', function(event) {
+        if (event.ctrlKey && event.key === 's') {
+            event.preventDefault(); // Prevent default browser action for Ctrl+S
+            //trigger save button
+            $('#update').trigger('click');
+        }
+    });
 
-        // if control p is pressed trigger print button
-        $(document).on('keydown', function(event) {
-            if (event.ctrlKey && event.key === 'p') {
-                event.preventDefault(); // Prevent default browser action for Ctrl+P
-                //trigger print button
-                $('#print').trigger('click');
-            }
-        });
-    </script>
-    <style>
-        /* #HelpDiv {
+    // if control p is pressed trigger print button
+    $(document).on('keydown', function(event) {
+        if (event.ctrlKey && event.key === 'p') {
+            event.preventDefault(); // Prevent default browser action for Ctrl+P
+            //trigger print button
+            $('#print').trigger('click');
+        }
+    });
+    $(document).on('keydown', function(event) {
+        if (event.ctrlKey && event.key === 'p') {
+            event.preventDefault(); // Prevent default browser action for Ctrl+S
+
+            // Trigger save button
+            $('#update').trigger('click');
+
+            setTimeout(function() {
+
+                window.location.href = '/moi.php'; // Redirect to the desired URL
+            }, 500); 
+        }
+    });
+
+    // If Ctrl + P is pressed, trigger the print button
+    $(document).on('keydown', function(event) {
+        if (event.ctrlKey && event.key === 'p') {
+            event.preventDefault(); // Prevent default browser action for Ctrl+P
+
+            // Trigger print button
+            $('#print').trigger('click');
+        }
+    });
+</script>
+
+<style>
+    /* #HelpDiv {
             display: none !important;
         } */
-    </style>
+</style>
 
 
 <?php include('footer.php'); ?>

@@ -558,62 +558,6 @@ if ($total_amount === null) {
         });
     </script>
     <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.js"></script>
-    <script>
-        // $("#contactNumber").autocomplete({
-        //     source: function(request, response) {
-        //         $.ajax({
-        //             url: "contactNumbers.php?fest_id=<?php echo $festival_id; ?>",
-        //             dataType: "jsonp",
-        //             data: {
-        //                 term: request.term
-        //             },
-        //             success: function(data) {
-        //                 response(data);
-        //             }
-        //         });
-        //     },
-        //     minLength: 2,
-        //     select: function(event, ui) {}
-        // });
-
-        $("#contactNumber")
-            // don't navigate away from the field on tab when selecting an item
-            .on("keydown", function(event) {
-                if (event.keyCode === $.ui.keyCode.TAB &&
-                    $(this).autocomplete("instance").menu.active) {
-                    event.preventDefault();
-                }
-            })
-            .autocomplete({
-                source: function(request, response) {
-                    $.getJSON("contactNumbers.php", {
-                        term: request.term
-                    }, response);
-                },
-                focus: function() {
-                    // prevent value inserted on focus
-                    return false;
-                },
-                select: function(event, ui) {
-                    $('#name').val(ui.item.name);
-                    $('#spouse_name').val(ui.item.spouse_name);
-                    $('#relative_name').val(ui.item.relative_name);
-                    $('#place').val(ui.item.place);
-                    $('#profession').val(ui.item.profession);
-                    $('#profession1').val(ui.item.profession1);
-                    $('#contactNumber').val(ui.item.contactNumber);
-                    return false;
-                }
-            });
-    </script>
-    <style>
-        /* #HelpDiv {
-            display: none !important;
-        } */
-    </style>
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.0/themes/base/jquery-ui.css">
-
-
 </body>
 
 </html>
