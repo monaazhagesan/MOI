@@ -436,75 +436,50 @@ if ($total_amount === null) {
     }
 </script>
 <SCRIPT language=JavaScript src="assets/js/utf.js"></SCRIPT>
-<SCRIPT language=JavaScript src="assets/js/tamil.js"></SCRIPT>
-<script type="text/javascript" src="assets/js/jquery.js"></script>
-<script>
-    $(document).on('keypress', '.convertLang', function(event) {
-        if ($('input[name="language"]').val() == 'tamil') {
-            convertThis(event);
-        }
-    });
-    // on click shortcut (ctrl+l) change language
-    // Listen for the keydown event to detect Ctrl+L
-    $(document).on('keydown', function(event) {
-        console.log(event.key);
-        if (event.ctrlKey && event.key === 'l') {
-            event.preventDefault(); // Prevent default browser action for Ctrl+L
-            //change language radio
+    <SCRIPT language=JavaScript src="assets/js/tamil.js"></SCRIPT>
+    <script type="text/javascript" src="assets/js/jquery.js"></script>
+    <script>
+        $(document).on('keypress', '.convertLang', function(event) {
             if ($('input[name="language"]').val() == 'tamil') {
-                $('input[name="language"]').val('english');
-            } else {
-                $('input[name="language"]').val('tamil');
+                convertThis(event);
             }
-        }
-    });
-    // if control s is pressed trigger save button
-    $(document).on('keydown', function(event) {
-        if (event.ctrlKey && event.key === 's') {
-            event.preventDefault(); // Prevent default browser action for Ctrl+S
-            //trigger save button
-            $('#update').trigger('click');
-        }
-    });
+        });
+        // on click shortcut (ctrl+l) change language
+        // Listen for the keydown event to detect Ctrl+L
+        $(document).on('keydown', function(event) {
+            console.log(event.key);
+            if (event.ctrlKey && event.key === 'l') {
+                event.preventDefault(); // Prevent default browser action for Ctrl+L
+                //change language radio
+                if ($('input[name="language"]').val() == 'tamil') {
+                    $('input[name="language"]').val('english');
+                } else {
+                    $('input[name="language"]').val('tamil');
+                }
+            }
+        });
+        // if control s is pressed trigger save button
+        $(document).on('keydown', function(event) {
+            if (event.ctrlKey && event.key === 's') {
+                event.preventDefault(); // Prevent default browser action for Ctrl+S
+                //trigger save button
+                $('#update').trigger('click');
+            }
+        });
 
-    // if control p is pressed trigger print button
-    $(document).on('keydown', function(event) {
-        if (event.ctrlKey && event.key === 'p') {
-            event.preventDefault(); // Prevent default browser action for Ctrl+P
-            //trigger print button
-            $('#print').trigger('click');
-        }
-    });
-    $(document).on('keydown', function(event) {
-        if (event.ctrlKey && event.key === 'p') {
-            event.preventDefault(); // Prevent default browser action for Ctrl+S
-
-            // Trigger save button
-            $('#update').trigger('click');
-
-            setTimeout(function() {
-
-                window.location.href = '/moi.php'; // Redirect to the desired URL
-            }, 500); 
-        }
-    });
-
-    // If Ctrl + P is pressed, trigger the print button
-    $(document).on('keydown', function(event) {
-        if (event.ctrlKey && event.key === 'p') {
-            event.preventDefault(); // Prevent default browser action for Ctrl+P
-
-            // Trigger print button
-            $('#print').trigger('click');
-        }
-    });
-</script>
-
-<style>
-    /* #HelpDiv {
+        // if control p is pressed trigger print button
+        $(document).on('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'p') {
+                event.preventDefault(); // Prevent default browser action for Ctrl+P
+                //trigger print button
+                $('#print').trigger('click');
+            }
+        });
+    </script>
+    <style>
+        /* #HelpDiv {
             display: none !important;
         } */
-</style>
-
+    </style>
 
 <?php include('footer.php'); ?>
